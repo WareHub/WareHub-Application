@@ -1,45 +1,49 @@
 <LoginScreen>
 
 	orientation: 'vertical'
-	padding: 160, 50
-	spacing: 10
-	background_color: 0, 0, 1, 1
-			
-	Label:
-		text: 'User Name'
-		size_hint: 1, 0.0001
-		background_color:[ 1, 1, 1, 1]
-		font_size: 24
+	padding: 50, 50, 50, 50
+	spacing: 20
+	size: self.size
+
+
+	Widget:
+		size_hint:1, None
+		height: 100
 		
 		
 	TextInput:
-		size_hint: 1, 0.001
-		font_size: 32
+		id: username_text
+		size_hint: 1, None
+		font_size: 16
+		height: 32
 		color: 0, 0, 1, 1
 		valign: 'middle'
 		halign: 'middle'
 		background_color:[ 1, 1, 1, 1]
 		multiline: False
+		hint_text: 'username'
 		
-		
-	Label:
-		text: 'Password'
-		size_hint: 1, 0.0001
-		color: [0.5, 0.5, 0.5, 1]
-		font_size: 24
 		
 		
 	TextInput:
-		size_hint: 1, 0.001
-		font_size: 32
+		id: password_text
+		size_hint: 1, None
+		font_size: 16
+		height: 32 		
         multiline: False
+        password: True
+        hint_text: 'password'
+
+
+    Widget:
+
 		
 		
     Button:
+    	id: login_bt
+    	size_hint: 1, None
+    	height: 40
+    	font_size: 16
 		text: 'Login'
-		size_hint: 1, 0.001
-		font_size: 32
-		color:0, 0, 0, 1
-		background_normal: ''
-		background_down: 'metal.png'
 		background_color: .88, .88, .88, 1
+		on_press: root.login()
