@@ -1,0 +1,45 @@
+<LoginScreen>
+
+	orientation: 'vertical'
+	padding: 160, 50
+	spacing: 10
+	background_color: 0, 0, 1, 1
+			
+	Label:
+		text: 'User Name'
+		size_hint: 1, 0.0001
+		background_color:[ 1, 1, 1, 1]
+		font_size: 24
+		
+		
+	TextInput:
+		size_hint: 1, 0.001
+		font_size: 32
+		color: 0, 0, 1, 1
+		valign: 'middle'
+		halign: 'middle'
+		background_color:[ 1, 1, 1, 1]
+		multiline: False
+		
+		
+	Label:
+		text: 'Password'
+		size_hint: 1, 0.0001
+		color: [0.5, 0.5, 0.5, 1]
+		font_size: 24
+		
+		
+	TextInput:
+		size_hint: 1, 0.001
+		font_size: 32
+        multiline: False
+		
+		
+    Button:
+		text: 'Login'
+		size_hint: 1, 0.001
+		font_size: 32
+		color:0, 0, 0, 1
+		background_normal: ''
+		background_down: 'metal.png'
+		background_color: .88, .88, .88, 1
