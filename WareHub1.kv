@@ -53,9 +53,95 @@
 	    	font_size: 16
 			text: 'Login'
 			background_color: .88, .88, .88, 1
-			on_press: root.login()
+			on_release: root.login()
 
 
+
+
+<AddUserScreen>:
+	BoxLayout:
+
+		orientation: 'vertical'
+		padding: 50, 50, 50, 50
+		spacing: 20
+		
+			
+		TextInput:
+			id: name_text
+			size_hint: 1, None
+			font_size: 16
+			height: 32
+			multiline: False
+			hint_text: 'name'
+			
+			
+			
+		TextInput:
+			id: password_text
+			size_hint: 1, None
+			font_size: 16
+			height: 32 		
+	        multiline: False
+	        password: True
+	        hint_text: 'password'
+
+	    TextInput:
+			id: phone_text
+			size_hint: 1, None
+			font_size: 16
+			height: 32 		
+	        multiline: False
+	        password: True
+	        hint_text: 'phone'
+
+	    TextInput:
+			id: points_text
+			size_hint: 1, None
+			font_size: 16
+			height: 32 		
+	        multiline: False
+	        password: True
+	        hint_text: 'points'
+
+	    BoxLayout:
+	    	CheckBox:
+	    		group: True
+	    	Label:
+	    		text: 'Manager'
+	    	CheckBox:
+	    		group: True
+	    	Label:
+	    		text: 'Student'
+	    	CheckBox:
+	    		group: True
+	    	Label:
+	    		text: 'Technician'
+
+	    BoxLayout:
+	    	CheckBox:
+	    	Label:
+	    		text: 'TA'
+
+	    Widget:
+
+	    Button:
+	    	size_hint: 1, None
+	    	height: 40
+	    	font_size: 16
+			text: 'Add User'
+			background_color: .88, .88, .88, 1
+
+		Widget:
+
+		Button:
+	    	size_hint: None, None
+	    	height: 40	
+	    	width: 100
+	    	font_size: 16
+			text: 'Back'
+			on_release: root.manager.current = 'manager_screen'
+
+	    Widget:
 
 
 
@@ -69,29 +155,120 @@
 		
 			orientation: 'vertical'
 			padding: 30, 100, 30, 100
-			spacing: 60
+			spacing: 40
 
 			Button:
 		    	text: 'Add User'
+		    	on_release: root.manager.current = 'adduser_screen'
 
 
 		    Button:
 		    	text: 'Get Students'
-		    	on_press: root.getStudents()
+		    	on_release: root.getStudents()
 
 		    Button:
 		    	text: 'Get Technicians'
-		    	on_press: root.getTechs()
+		    	on_release: root.getTechs()
+
+		    Button:
+		    	text: 'Get Devices'
+		    	on_release: root.getDevices()
 
 		    Button:
 		    	text: 'Sign out'
-		    	on_press: root.manager.current = 'login_screen'; root.my_list.adapter.data = []
+		    	on_release: root.manager.current = 'login_screen'; root.my_list.adapter.data = []
 
 		ListView:
 	        id: students_list_view
 	        adapter:
 	            ListAdapter(data=[],args_converter=lambda row_index, an_obj: {'text': an_obj,'size_hint_y': None,'height': 40}, cls=main.Student)
 
+
+
+
+<StudentScreen>:
+	my_list: students_list_view
+	BoxLayout:
+		orientation: 'horizontal'
+		BoxLayout:
+		
+			orientation: 'vertical'
+			padding: 30, 100, 30, 100
+			spacing: 40
+
+			Button:
+		    	text: 'Update Information'
+		    	on_release: root.manager.current = 'updateinfo_screen'
+
+		    Button:
+		    	text: 'Demand Device'
+
+		    Button:
+		    	text: 'My Demands'
+
+		    Button:
+		    	text: 'Get Devices'
+
+		    Button:
+		    	text: 'Sign out'
+		    	on_release: root.manager.current = 'login_screen'; root.my_list.adapter.data = []
+
+		ListView:
+	        id: students_list_view
+	        adapter:
+	            ListAdapter(data=[],args_converter=lambda row_index, an_obj: {'text': an_obj,'size_hint_y': None,'height': 40}, cls=main.Student)
+
+
+<UpdateInfoScreen>:
+	BoxLayout:
+
+		orientation: 'vertical'
+		padding: 50, 50, 50, 50
+		spacing: 30
+		
+		Widget:
+			
+		TextInput:
+			id: password_text
+			size_hint: 1, None
+			font_size: 16
+			height: 32
+			multiline: False
+			hint_text: 'password'
+			
+			
+			
+		TextInput:
+			id: phone_text
+			size_hint: 1, None
+			font_size: 16
+			height: 32 		
+	        multiline: False
+	        password: True
+	        hint_text: 'phone'
+
+	    Widget:
+
+
+
+	    Button:
+	    	size_hint: 1, None
+	    	height: 40	
+	    	font_size: 16
+			text: 'Update Information'
+
+		Widget:
+
+		Button:
+	    	size_hint: None, None
+	    	height: 40	
+	    	width: 100
+	    	font_size: 16
+			text: 'Back'
+			on_release: root.manager.current = 'student_screen'
+
+
+	    Widget:
 
 
 
@@ -112,3 +289,18 @@
 		name: 'manager_screen'
 		manager: screen_manager
 
+
+	StudentScreen:
+		id: student_screen
+		name: 'student_screen'
+		manager: screen_manager
+
+	AddUserScreen:
+		id: adduser_screen
+		name: 'adduser_screen'
+		manager: screen_manager
+
+	UpdateInfoScreen:
+		id: updateinfo_screen
+		name: 'updateinfo_screen'
+		manager: screen_manager
