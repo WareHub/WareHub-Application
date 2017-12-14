@@ -1,49 +1,114 @@
-<LoginScreen>
-
-	orientation: 'vertical'
-	padding: 50, 50, 50, 50
-	spacing: 20
-	size: self.size
-
-
-	Widget:
-		size_hint:1, None
-		height: 100
-		
-		
-	TextInput:
-		id: username_text
-		size_hint: 1, None
-		font_size: 16
-		height: 32
-		color: 0, 0, 1, 1
-		valign: 'middle'
-		halign: 'middle'
-		background_color:[ 1, 1, 1, 1]
-		multiline: False
-		hint_text: 'username'
-		
-		
-		
-	TextInput:
-		id: password_text
-		size_hint: 1, None
-		font_size: 16
-		height: 32 		
-        multiline: False
-        password: True
-        hint_text: 'password'
+# Reference App1.py
+#: import main App1
+#: import FadeTransition kivy.uix.screenmanager.FadeTransition
+#: import ListAdapter kivy.adapters.listadapter.ListAdapter
+#: import ListItemButton kivy.uix.listview.ListItemButton
 
 
-    Widget:
+<LoginScreen>:
+	BoxLayout:
 
+		orientation: 'vertical'
+		padding: 50, 50, 50, 50
+		spacing: 20
+		size: self.size
+
+
+		Widget:
+			size_hint:1, None
+			height: 100
+			
+			
+		TextInput:
+			id: username_text
+			size_hint: 1, None
+			font_size: 16
+			height: 32
+			color: 0, 0, 1, 1
+			valign: 'middle'
+			halign: 'middle'
+			background_color:[ 1, 1, 1, 1]
+			multiline: False
+			hint_text: 'username'
+			
+			
+			
+		TextInput:
+			id: password_text
+			size_hint: 1, None
+			font_size: 16
+			height: 32 		
+	        multiline: False
+	        password: True
+	        hint_text: 'password'
+
+
+	    Widget:
+
+			
+			
+	    Button:
+	    	size_hint: 1, None
+	    	height: 40
+	    	font_size: 16
+			text: 'Login'
+			background_color: .88, .88, .88, 1
+			on_press: root.login()
+
+
+
+
+
+
+
+<ManagerScreen>:
+	my_list: students_list_view
+	BoxLayout:
+		orientation: 'horizontal'
+		BoxLayout:
 		
-		
-    Button:
-    	id: login_bt
-    	size_hint: 1, None
-    	height: 40
-    	font_size: 16
-		text: 'Login'
-		background_color: .88, .88, .88, 1
-		on_press: root.login()
+			orientation: 'vertical'
+			padding: 30, 100, 30, 100
+			spacing: 60
+
+			Button:
+		    	text: 'Add User'
+
+
+		    Button:
+		    	text: 'Get Students'
+		    	on_press: root.getStudents()
+
+		    Button:
+		    	text: 'Get Technicians'
+		    	on_press: root.getTechs()
+
+		    Button:
+		    	text: 'Sign out'
+		    	on_press: root.manager.current = 'login_screen'; root.my_list.adapter.data = []
+
+		ListView:
+	        id: students_list_view
+	        adapter:
+	            ListAdapter(data=[],args_converter=lambda row_index, an_obj: {'text': an_obj,'size_hint_y': None,'height': 40}, cls=main.Student)
+
+
+
+
+
+
+<ScreenManagment>:
+	id: screen_manager
+	login_screen: login_screen
+	manager_screen: manager_screen
+
+	LoginScreen:
+		id: login_screen
+		name:"login_screen"
+		manager: screen_manager
+
+	ManagerScreen:
+		id: manager_screen
+		name: 'manager_screen'
+		manager: screen_manager
+
