@@ -27,7 +27,7 @@ class LoginScreen(Screen):
     def login(self):
     	userName = self.ids.username_text.text
     	password = self.ids.password_text.text
-    	self.manager.current = 'tech_screen'
+    	#self.manager.current = 'tech_screen'
     	if len(userName)>0 and len(password)>0:
     		try:
     			idUser = int(userName)
@@ -129,7 +129,13 @@ class AddUserScreen(Screen):
 class UpdateInfoScreen(Screen):
 	def on_pre_enter(self):
 		try:
-			data = requests.get('http://warehub-api.azurewebsites.net/getstudent/{}'.format(ID))
+			if myType == 0:
+				g = 'getmanager'
+			elif myType == 1:
+				g = 'getstudent'
+			else:
+				g = 'gettech'
+			data = requests.get('http://warehub-api.azurewebsites.net/{}/{}'.format(g, ID))
 			data = json.loads(data.text)
 			print (ID)
 			print (data)
