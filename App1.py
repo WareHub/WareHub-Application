@@ -20,22 +20,25 @@ import json
 
 ID = 0
 myPassword = ''
+myType = -1
 
 class LoginScreen(Screen):
 
     def login(self):
     	userName = self.ids.username_text.text
     	password = self.ids.password_text.text
+    	self.manager.current = 'tech_screen'
     	if len(userName)>0 and len(password)>0:
     		try:
-    			self.manager.current = 'manager_screen'
     			idUser = int(userName)
     			payload = {'': [userName, password]}
     			isLoggedin = requests.post('http://warehub-api.azurewebsites.net/login', data = payload)
 
     			isLoggedin = int(isLoggedin.text)
+    			global ID, myPassword, myType
     			ID = idUser
     			myPassword = password
+    			myType = isLoggedin
     			if (isLoggedin == 0):
     				self.manager.current = 'manager_screen'
     			elif isLoggedin == 1:
@@ -92,23 +95,74 @@ class StudentScreen(Screen):
 
 
 class AddUserScreen(Screen):
-	pass
+	def insertUser(self):
+		name = self.ids.name_text.text
+		password = self.ids.password_text.text
+		phone = self.ids.phone_text.text
+		points = self.ids.points_text.text
+		if len(name)>0 and len(password)>0 and len(phone)>0 and len(points)>0:
+			try:
+				pointsI = int(points)
+				phoneI = int(phone)
+				isTA = 0
+				if bool(self.ids.manager_radiobutton.active):
+					typeUser = 0
+				elif bool(self.ids.student_radiobutton.active):
+					typeUser = 1
+					isTA = int(self.ids.ta_checkbox.active)
+				elif bool(self.ids.tech_radiobutton.active):
+					typeUser = 2
+				else:
+					message = 'please enter user type'
+					return
+				payload = {'': [str(typeUser), name, password, phone, str(isTA), str(points)]}
+				print (payload)
+				requests.post('http://warehub-api.azurewebsites.net/insertuser', data = payload)
+			except ValueError:
+				message = 'Enter valid information'
+			except requests.exceptions.ConnectionError:
+				message = 'Check your internet connetcion'
+		else:
+			message = 'Please enter all information of user'
 
 
 class UpdateInfoScreen(Screen):
-	'''def on_enter(self):
+	def on_pre_enter(self):
 		try:
 			data = requests.get('http://warehub-api.azurewebsites.net/getstudent/{}'.format(ID))
 			data = json.loads(data.text)
 			print (ID)
 			print (data)
 			self.ids.password_text.text = myPassword
-			self.ids.phone_text.text = data[0][2]
+			self.ids.phone_text.text = str(data[0][2])
 		except requests.exceptions.ConnectionError:
-			message = 'Check your internet connetcion'''
+			message = 'Check your internet connetcion'
 
 	def updateInfo(self):
-		pass
+		password = self.ids.password_text.text
+		phone = self.ids.phone_text.text
+		if len(password) > 0 and len(phone) > 0:
+			try:
+				payload = {'': [str(myType), str(ID), password, phone]}
+				requests.post('http://warehub-api.azurewebsites.net/updateinfo', data = payload)
+				myPassword = password
+			except requests.exceptions.ConnectionError:
+				message = 'check your internet connection'
+		else:
+			message = 'please enter your password and phone'
+
+
+	def backButton(self):
+		if myType == 0:
+			self.manager.current = 'manager_screen'
+		elif myType == 1:
+			self.manager.current = 'student_screen'
+		else:
+			self.manager.current = 'tech_screen'
+
+
+class TechScreen(Screen):
+	pass
 
 
 class ScreenManagment(ScreenManager):
