@@ -69,8 +69,8 @@
 		TextInput:
 			id: name_text
 			size_hint: 1, None
-			font_size: 16
-			height: 32
+			font_size: 40
+			height: 80
 			multiline: False
 			hint_text: 'name'
 			
@@ -79,8 +79,8 @@
 		TextInput:
 			id: password_text
 			size_hint: 1, None
-			font_size: 16
-			height: 32 		
+			font_size: 40
+			height: 80 		
 	        multiline: False
 	        password: True
 	        hint_text: 'password'
@@ -88,16 +88,16 @@
 	    TextInput:
 			id: phone_text
 			size_hint: 1, None
-			font_size: 16
-			height: 32 		
+			font_size: 40
+			height: 80 		
 	        multiline: False
 	        hint_text: 'phone'
 
 	    TextInput:
 			id: points_text
 			size_hint: 1, None
-			font_size: 16
-			height: 32 		
+			font_size: 40
+			height: 80 		
 	        multiline: False
 	        hint_text: 'points'
 
@@ -107,29 +107,33 @@
 	    		group: True
 	    	Label:
 	    		text: 'Manager'
+	    		font_size: 30
 	    	CheckBox:
 	    		id: student_radiobutton
 	    		group: True
 	    	Label:
 	    		text: 'Student'
+	    		font_size: 30
 	    	CheckBox:
 	    		id: tech_radiobutton
 	    		group: True
 	    	Label:
 	    		text: 'Technician'
+	    		font_size: 30
 
 	    BoxLayout:
 	    	CheckBox:
 	    		id: ta_checkbox
 	    	Label:
 	    		text: 'TA'
+	    		font_size: 30
 
 	    Widget:
 
 	    Button:
 	    	size_hint: 1, None
-	    	height: 40
-	    	font_size: 16
+	    	height: 80
+	    	font_size: 40
 			text: 'Add User'
 			on_release: root.insertUser()
 
@@ -137,9 +141,9 @@
 
 		Button:
 	    	size_hint: None, None
-	    	height: 40	
-	    	width: 100
-	    	font_size: 16
+	    	height: 80	
+	    	width: 200
+	    	font_size: 40
 			text: 'Back'
 			on_release: root.manager.current = 'manager_screen'
 
@@ -185,11 +189,19 @@
 		    	on_release: root.manager.current = 'login_screen'; root.my_list.adapter.data = []
 
 		BoxLayout:
-			padding: 20, 70, 20, 70
+			padding: 20, 70, 20, 20
+			orientation: 'vertical'
+			spacing: 20
 			ListView:
 		        id: students_list_view
 		        adapter:
-		            ListAdapter(data=[],args_converter=lambda row_index, an_obj: {'text': an_obj,'size_hint_y': None,'height': 80}, cls=main.Student, selection_mode='single', allow_empty_selection=True)
+		            ListAdapter(data=[],args_converter=lambda row_index, an_obj: {'text': an_obj,'size_hint_y': None,'height': 160}, cls=main.Student, selection_mode='single', allow_empty_selection=True)
+
+		    Button:
+		    	size_hint_y: None
+		    	height: 60
+		    	text: 'Delete'
+		    	on_release: root.deleteElement()
 
 
 
@@ -282,8 +294,8 @@
 		TextInput:
 			id: password_text
 			size_hint: 1, None
-			font_size: 16
-			height: 32
+			font_size: 40
+			height: 80
 			multiline: False
 			password: True
 			hint_text: 'password'
@@ -293,8 +305,8 @@
 		TextInput:
 			id: phone_text
 			size_hint: 1, None
-			font_size: 16
-			height: 32 		
+			font_size: 40
+			height: 80 		
 	        multiline: False
 	        hint_text: 'phone'
 
@@ -304,8 +316,8 @@
 
 	    Button:
 	    	size_hint: 1, None
-	    	height: 40	
-	    	font_size: 16
+	    	height: 80	
+	    	font_size: 40
 			text: 'Update Information'
 			on_release: root.updateInfo()
 
@@ -315,9 +327,9 @@
 
 		Button:
 	    	size_hint: None, None
-	    	height: 40	
-	    	width: 100
-	    	font_size: 16
+	    	height: 80	
+	    	width: 200
+	    	font_size: 40
 			text: 'Back'
 			on_release: root.manager.current = root.backButton()
 
