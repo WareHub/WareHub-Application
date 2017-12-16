@@ -254,13 +254,16 @@
 		    Button:
 		    	text: 'My Demands'
 
-		    Button:
+		    Spinner:
 		    	text: 'Get Devices'
+				id: Devices_Spinner
+				#values: devices_names
+				
 
 		    Button:
 		    	text: 'Sign out'
 		    	on_release: root.manager.current = 'login_screen'; root.my_list.adapter.data = []
-
+			
 		ListView:
 	        id: students_list_view
 	        adapter:

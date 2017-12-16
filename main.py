@@ -14,6 +14,12 @@ from kivy.lang import Builder
 from kivy.properties import ObjectProperty, NumericProperty
 from kivy.uix.listview import ListItemButton
 from kivy.uix.checkbox import CheckBox
+
+from kivy.uix.spinner import Spinner
+from kivy.uix.dropdown import DropDown
+from kivy.uix.button import Button
+from kivy.base import runTouchApp
+
 import json
 
 
@@ -27,7 +33,7 @@ class LoginScreen(Screen):
     def login(self):
     	userName = self.ids.username_text.text
     	password = self.ids.password_text.text
-    	#self.manager.current = 'manager_screen'
+    	self.manager.current = 'student_screen'
     	if len(userName)>0 and len(password)>0:
     		try:
     			idUser = int(userName)
@@ -94,10 +100,57 @@ class ManagerScreen(Screen):
 			message = 'Check your internet connetcion'
 
 
-
 class StudentScreen(Screen):
-	pass
+	selected_device=""
+	selected_one_device=""
+	##set function to do some thing you need when select (name dosen't effect)
+	def show_selected_value_spinner(self,spinner, text):
+		self.selected_device=text
+		self.getDevices()
 
+	def show_selected_value_list(self,ad):
+		print (ad.selection[0].text)	
+
+	def on_pre_enter(self):
+		self.devices_names={'PCs':'5','Data shows':'2','Microphones':'1','Kits':'3','Arduinos':'4','Bread boards':'6','ICs':'7'}
+		self.ids.Devices_Spinner.values = self.devices_names
+		self.ids.Devices_Spinner.bind(text=self.show_selected_value_spinner)
+
+	def getDevices(self):
+		try:
+			num=self.devices_names[self.selected_device]
+			data = requests.get('http://warehub-api.azurewebsites.net/retrive_devices/{}'.format(num))
+			data = json.loads(data.text)
+			self.my_list.adapter.data = []
+			strpre="device number:{} type:{} location:{} state:{} rate:{}"
+			self.my_list.adapter.bind(on_selection_change=self.show_selected_value_list)
+			for s in data:
+				self.my_list.adapter.data.extend([strpre.format(s[0]%1000000,s[1],s[2],s[3],s[4]/s[5])])
+				self.my_list._trigger_reset_populate()
+		except requests.exceptions.ConnectionError:
+			message = 'Check your internet connetcion'
+
+	def getOneDevice(self):
+    		try:
+			num=self.devices_names[self.selected_device]
+			data = requests.get('http://warehub-api.azurewebsites.net/retrive_devices/{}'.format(num))
+			data = json.loads(data.text)
+			self.my_list.adapter.data = []
+			#strpre1="device number  type    location    state   rate"
+			#self.my_list.adapter.data.extend([strpre1])
+			#strpre="{}              {}      {}          {}      {}"
+			strpre="device number:{} type:{} location:{} state:{} rate:{}"
+			for s in data:
+				self.my_list.adapter.data.extend([strpre.format(s[0]%1000000,s[1],s[2],s[3],s[4]/s[5])])
+				self.my_list._trigger_reset_populate()
+		except requests.exceptions.ConnectionError:
+			message = 'Check your internet connetcion'
+
+	
+
+
+
+	
 
 class AddUserScreen(Screen):
 	def insertUser(self):
@@ -179,10 +232,6 @@ class TechScreen(Screen):
 class ScreenManagment(ScreenManager):
 	login_screen = ObjectProperty(None)
 	manager_screen = ObjectProperty(None)
-	student_screen = ObjectProperty(None)
-	tech_screen = ObjectProperty(None)
-	updateinfo_screen = ObjectProperty(None)
-	adduser_screen = ObjectProperty(None)
 
 
 
@@ -190,7 +239,7 @@ class ScreenManagment(ScreenManager):
 
     
 class WareHub1App(App):
-
+    
     def build(self):
         return ScreenManagment(transition = NoTransition())
 
