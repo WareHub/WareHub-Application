@@ -97,18 +97,19 @@ class ManagerScreen(Screen):
 
 class StudentScreen(Screen):
 	selected_device=""
+	selected_one_device=""
 	##set function to do some thing you need when select (name dosen't effect)
-	def show_selected_value(self,spinner, text):
+	def show_selected_value_spinner(self,spinner, text):
 		self.selected_device=text
 		self.getDevices()
-		
+
+	def show_selected_value_list(self,ad):
+		print (ad.selection[0].text)	
 
 	def on_pre_enter(self):
 		self.devices_names={'PCs':'5','Data shows':'2','Microphones':'1','Kits':'3','Arduinos':'4','Bread boards':'6','ICs':'7'}
 		self.ids.Devices_Spinner.values = self.devices_names
-		###########################################################################
-		########bind some thing is to call the binding thing after any change and sind to it the funtion 
-		self.ids.Devices_Spinner.bind(text=self.show_selected_value)
+		self.ids.Devices_Spinner.bind(text=self.show_selected_value_spinner)
 
 	def getDevices(self):
 		try:
@@ -116,10 +117,8 @@ class StudentScreen(Screen):
 			data = requests.get('http://warehub-api.azurewebsites.net/retrive_devices/{}'.format(num))
 			data = json.loads(data.text)
 			self.my_list.adapter.data = []
-			#strpre1="device number  type    location    state   rate"
-			#self.my_list.adapter.data.extend([strpre1])
-			#strpre="{}              {}      {}          {}      {}"
 			strpre="device number:{} type:{} location:{} state:{} rate:{}"
+			self.my_list.adapter.bind(on_selection_change=self.show_selected_value_list)
 			for s in data:
 				self.my_list.adapter.data.extend([strpre.format(s[0]%1000000,s[1],s[2],s[3],s[4]/s[5])])
 				self.my_list._trigger_reset_populate()
