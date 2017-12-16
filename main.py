@@ -28,6 +28,8 @@ import json
 ID = 0
 myPassword = ''
 myType = -1
+textofDeviceStudent=""
+devices_names ={'PCs':'5','Data shows':'2','Microphones':'1','Kits':'3','Arduinos':'4','Bread boards':'6','ICs':'7'}
 
 class LoginScreen(Screen):
 
@@ -119,13 +121,13 @@ class DeviceStudentScreen(Screen):
 	def on_pre_enter(self):
 		try:
 			self.id=textofDeviceStudent.split(" type")[0][14:]
-			num=textofDeviceStudent[-2:]
-			print(textofDeviceStudent)
+			num=textofDeviceStudent[-1:]
+			print(textofDeviceStudent,num)
 			self.id=num*1000000+id
 			data = requests.get('http://warehub-api.azurewebsites.net/getdevicereviews/{}'.format(id))
 			data = json.loads(data.text)
 			self.listonedevice.adapter.data = []
-			self.listonedevice.adapter.data.extend([textofDeviceStudent])
+			self.listonedevice.adapter.data.extend([textofDeviceStudent[:-1]])
 			strpre="time:{} opinion:{} rate:{}"
 			for s in data:
 				self.listonedevice.adapter.data.extend([str(s[2]),str(s[3]),str(s[4])])
@@ -143,9 +145,9 @@ class StudentScreen(Screen):
 
 	def show_selected_value_list(self,ad):
 		try:
-			global textofDeviceStudent
-			textofDeviceStudent=str(ad.selection[0].text)+str(self.selected_device)
-			self.ids.my_boxlayout.clear_widgets()
+			global textofDeviceStudent,devices_names
+			textofDeviceStudent=str(ad.selection[0].text)+str(devices_names[self.selected_device])
+			self.ids.studentbox.clear_widgets()
 			self.manager.current = 'device_student_screen'
 			
 		except:
@@ -154,7 +156,6 @@ class StudentScreen(Screen):
 
 	def on_pre_enter(self):
 		global devices_names
-		devices_names ={'PCs':'5','Data shows':'2','Microphones':'1','Kits':'3','Arduinos':'4','Bread boards':'6','ICs':'7'}
 		self.ids.Devices_Spinner.values = devices_names
 		self.ids.Devices_Spinner.bind(text=self.show_selected_value_spinner)
 
@@ -247,9 +248,61 @@ class UpdateInfoScreen(Screen):
 		else:
 			self.manager.current = 'tech_screen'
 
+class DeviceTechScreen(Screen):
+	def on_pre_enter(self):
+		try:
+			self.id=textofDeviceStudent.split(" type")[0][14:]
+			num=textofDeviceStudent[-1:]
+			print(textofDeviceStudent,num)
+			self.id=num*1000000+id
+			data = requests.get('http://warehub-api.azurewebsites.net/getdevicereviews/{}'.format(id))
+			data = json.loads(data.text)
+			self.ids.one_device_Tech.adapter.data = []
+			self.ids.one_device_Tech.adapter.data.extend([textofDeviceStudent[:-1]])
+			strpre="time:{} opinion:{} rate:{}"
+			for s in data:
+				self.ids.one_device_Tech.adapter.data.extend([str(s[2]),str(s[3]),str(s[4])])
+				self.ids.one_device_Tech._trigger_reset_populate()
+		except requests.exceptions.ConnectionError:
+			message = 'Check your internet connetcion'
+
 
 class TechScreen(Screen):
-	pass
+	selected_device=""
+	##set function to do some thing you need when select (name dosen't effect)
+	def show_selected_value_spinner(self,spinner, text):
+		self.selected_device=text
+		self.getDevices()
+
+	def show_selected_value_list(self,ad):
+		try:
+			global textofDeviceStudent,devices_names
+			textofDeviceStudent=str(ad.selection[0].text)+str(devices_names[self.selected_device])
+			self.ids.techbox.clear_widgets()
+			self.manager.current = 'device_tech_screen'
+			
+		except:
+			pass
+
+
+	def on_pre_enter(self):
+		global devices_names
+		self.ids.Devices_Tech_Spinner.values = devices_names
+		self.ids.Devices_Tech_Spinner.bind(text=self.show_selected_value_spinner)
+
+	def getDevices(self):
+		try:
+			num=devices_names[self.selected_device]
+			data = requests.get('http://warehub-api.azurewebsites.net/retrive_devices/{}'.format(num))
+			data = json.loads(data.text)
+			self.tech_list_view.adapter.data = []
+			strpre="device number:{} type:{} location:{} state:{} rate:{}"
+			self.tech_list_view.adapter.bind(on_selection_change=self.show_selected_value_list)
+			for s in data:
+				self.tech_list_view.adapter.data.extend([strpre.format(s[0]%1000000,s[1],s[2],s[3],s[4]/s[5])])
+				self.tech_list_view._trigger_reset_populate()
+		except requests.exceptions.ConnectionError:
+			message = 'Check your internet connetcion'
 
 
 class ScreenManagment(ScreenManager):
