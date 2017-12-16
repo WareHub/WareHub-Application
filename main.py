@@ -33,7 +33,7 @@ class LoginScreen(Screen):
     def login(self):
     	userName = self.ids.username_text.text
     	password = self.ids.password_text.text
-    	self.manager.current = 'student_screen'
+    	#self.manager.current = 'student_screen'
     	if len(userName)>0 and len(password)>0:
     		try:
     			idUser = int(userName)
@@ -73,8 +73,18 @@ class Student(ListItemButton):
 
 class ManagerScreen(Screen):
 	
-	def show_Student(self, adapter):
-		self.manager.current = 'login_screen'
+	def deleteElement(self):
+		if self.mode == 0:
+			if self.my_list.adapter.selection:
+				text = self.my_list.adapter.selection[0].text
+				id = text[4:12]
+				try:
+					requests.delete('http://warehub-api.azurewebsites.net/deleteuser/{}'.format(id))
+					self.my_list.adapter.data.remove(text)
+					self.my_list._trigger_reset_populate()
+				except requests.exceptions.ConnectionError:
+					message = 'Check your internet connetcion'
+		
 
 	def getStudents(self):
 		try:
@@ -82,9 +92,9 @@ class ManagerScreen(Screen):
 			data = json.loads(data.text)
 			self.my_list.adapter.data = []
 			for s in data:
-				self.my_list.adapter.data.extend([s[1]])
+				self.my_list.adapter.data.extend(['ID: {}\nName: {}\nPhone: {}\nIsTA: {}     Points: {}'.format(s[0], s[1], s[2], s[3], s[4])])
 				self.my_list._trigger_reset_populate()
-			self.my_list.adapter.bind(on_selection_change=self.show_Student)
+			self.mode = 0
 		except requests.exceptions.ConnectionError:
 			message = 'Check your internet connetcion'
 
@@ -94,8 +104,9 @@ class ManagerScreen(Screen):
 			data = json.loads(data.text)
 			self.my_list.adapter.data = []
 			for s in data:
-				self.my_list.adapter.data.extend([s[1]])
+				self.my_list.adapter.data.extend(['ID: {}\nName: {}\nPhone: {}\nPoints: {}'.format(s[0], s[1], s[2], s[3])])
 				self.my_list._trigger_reset_populate()
+			self.mode = 0
 		except requests.exceptions.ConnectionError:
 			message = 'Check your internet connetcion'
 
@@ -131,7 +142,7 @@ class StudentScreen(Screen):
 			message = 'Check your internet connetcion'
 
 	def getOneDevice(self):
-    		try:
+		try:
 			num=self.devices_names[self.selected_device]
 			data = requests.get('http://warehub-api.azurewebsites.net/retrive_devices/{}'.format(num))
 			data = json.loads(data.text)
