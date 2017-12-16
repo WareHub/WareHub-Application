@@ -1,5 +1,5 @@
-# Reference App1.py
-#: import main App1
+# Reference main.py
+#: import main main
 #: import FadeTransition kivy.uix.screenmanager.FadeTransition
 #: import ListAdapter kivy.adapters.listadapter.ListAdapter
 #: import ListItemButton kivy.uix.listview.ListItemButton
@@ -9,8 +9,8 @@
 	BoxLayout:
 
 		orientation: 'vertical'
-		padding: 50, 50, 50, 50
-		spacing: 20
+		padding: 60, 50, 60, 100
+		spacing: 50
 		size: self.size
 
 
@@ -22,22 +22,22 @@
 		TextInput:
 			id: username_text
 			size_hint: 1, None
-			font_size: 16
-			height: 32
+			font_size: 40
+			height: 80
 			color: 0, 0, 1, 1
 			valign: 'middle'
 			halign: 'middle'
 			background_color:[ 1, 1, 1, 1]
 			multiline: False
-			hint_text: 'username'
+			hint_text: 'ID'
 			
 			
 			
 		TextInput:
 			id: password_text
 			size_hint: 1, None
-			font_size: 16
-			height: 32 		
+			font_size: 40
+			height: 80 		
 	        multiline: False
 	        password: True
 	        hint_text: 'password'
@@ -49,8 +49,8 @@
 			
 	    Button:
 	    	size_hint: 1, None
-	    	height: 40
-	    	font_size: 16
+	    	height: 80
+	    	font_size: 40
 			text: 'Login'
 			background_color: .88, .88, .88, 1
 			on_release: root.login()
@@ -157,7 +157,7 @@
 		
 			orientation: 'vertical'
 			padding: 30, 70, 30, 70
-			spacing: 30
+			spacing: 50
 
 			Button:
 		    	text: 'Add User'
@@ -184,10 +184,12 @@
 		    	text: 'Sign out'
 		    	on_release: root.manager.current = 'login_screen'; root.my_list.adapter.data = []
 
-		ListView:
-	        id: students_list_view
-	        adapter:
-	            ListAdapter(data=[],args_converter=lambda row_index, an_obj: {'text': an_obj,'size_hint_y': None,'height': 40}, cls=main.Student)
+		BoxLayout:
+			padding: 20, 70, 20, 70
+			ListView:
+		        id: students_list_view
+		        adapter:
+		            ListAdapter(data=[],args_converter=lambda row_index, an_obj: {'text': an_obj,'size_hint_y': None,'height': 80}, cls=main.Student)
 
 
 
@@ -314,7 +316,7 @@
 	    	width: 100
 	    	font_size: 16
 			text: 'Back'
-			on_release: root.manager.current = 'student_screen'
+			on_release: root.manager.current = root.backButton()
 
 
 	    Widget:
