@@ -157,6 +157,7 @@
 	my_list: students_list_view
 	BoxLayout:
 		orientation: 'horizontal'
+		id: my_boxlayout
 		BoxLayout:
 		
 			orientation: 'vertical'
@@ -183,7 +184,6 @@
 		    Button:
 		    	text: 'Update Information'
 		    	on_release: root.manager.current = 'updateinfo_screen'
-
 		    Button:
 		    	text: 'Sign out'
 		    	on_release: root.manager.current = 'login_screen'; root.my_list.adapter.data = []
@@ -272,6 +272,7 @@
 <StudentScreen>:
 	my_list: students_list_view
 	BoxLayout:
+		id: my_boxlayout
 		orientation: 'horizontal'
 		BoxLayout:
 		

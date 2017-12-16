@@ -111,6 +111,10 @@ class ManagerScreen(Screen):
 		except requests.exceptions.ConnectionError:
 			message = 'Check your internet connetcion'
 
+
+
+
+
 class DeviceStudentScreen(Screen):
 	def on_pre_enter(self):
 		try:
@@ -141,6 +145,7 @@ class StudentScreen(Screen):
 		try:
 			global textofDeviceStudent
 			textofDeviceStudent=str(ad.selection[0].text)+str(self.selected_device)
+			self.ids.my_boxlayout.clear_widgets()
 			self.manager.current = 'device_student_screen'
 			
 		except:
