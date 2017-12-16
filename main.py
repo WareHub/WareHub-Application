@@ -66,6 +66,9 @@ class Student(ListItemButton):
 
 
 class ManagerScreen(Screen):
+	def show_Student(self, adapter):
+		self.manager.current = 'login_screen'
+
 	def getStudents(self):
 		try:
 			data = requests.get('http://warehub-api.azurewebsites.net/getstudents')
@@ -74,6 +77,7 @@ class ManagerScreen(Screen):
 			for s in data:
 				self.my_list.adapter.data.extend([s[1]])
 				self.my_list._trigger_reset_populate()
+			self.my_list.adapter.bind(on_selection_change=self.show_Student)
 		except requests.exceptions.ConnectionError:
 			message = 'Check your internet connetcion'
 
