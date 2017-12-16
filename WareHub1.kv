@@ -203,6 +203,29 @@
 		    	text: 'Delete'
 		    	on_release: root.deleteElement()
 
+<DeviceStudentScreen>:
+	listonedevice: list_one_device
+	BoxLayout:
+		orientation: 'vertical'
+		BoxLayout:
+		
+			orientation: 'horizontal'
+			padding: 30, 70, 30, 70
+			spacing: 30
+
+			Button:
+		    	text: 'Add Review'
+		    	#on_release: root.manager.current = 'adduser_screen'
+
+
+		    Button:
+		    	text: 'Demand The Device'
+		    	#on_release: root.getStudents()
+
+		ListView:
+	        id: list_one_device
+	        adapter:
+	            ListAdapter(data=[],args_converter=lambda row_index, an_obj: {'text': an_obj,'size_hint_y': None,'height': 40}, cls=main.Student)
 
 
 
@@ -340,10 +363,12 @@
 
 
 
+
 <ScreenManagment>:
 	id: screen_manager
 	login_screen: login_screen
 	manager_screen: manager_screen
+	device_student_screen: device_student_screen
 
 	LoginScreen:
 		id: login_screen
@@ -359,6 +384,11 @@
 	StudentScreen:
 		id: student_screen
 		name: 'student_screen'
+		manager: screen_manager
+
+	DeviceStudentScreen:
+		id: device_student_screen
+		name: 'device_student_screen'
 		manager: screen_manager
 
 	AddUserScreen:

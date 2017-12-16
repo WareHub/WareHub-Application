@@ -1,6 +1,7 @@
 import kivy
 import requests
 
+import sys
 
 kivy.require('1.10.0')
 
@@ -110,26 +111,51 @@ class ManagerScreen(Screen):
 		except requests.exceptions.ConnectionError:
 			message = 'Check your internet connetcion'
 
+class DeviceStudentScreen(Screen):
+	def on_pre_enter(self):
+		try:
+			self.id=textofDeviceStudent.split(" type")[0][14:]
+			num=textofDeviceStudent[-2:]
+			print(textofDeviceStudent)
+			self.id=num*1000000+id
+			data = requests.get('http://warehub-api.azurewebsites.net/getdevicereviews/{}'.format(id))
+			data = json.loads(data.text)
+			self.listonedevice.adapter.data = []
+			self.listonedevice.adapter.data.extend([textofDeviceStudent])
+			strpre="time:{} opinion:{} rate:{}"
+			for s in data:
+				self.listonedevice.adapter.data.extend([str(s[2]),str(s[3]),str(s[4])])
+				self.listonedevice._trigger_reset_populate()
+		except requests.exceptions.ConnectionError:
+			message = 'Check your internet connetcion'
+
 
 class StudentScreen(Screen):
 	selected_device=""
-	selected_one_device=""
 	##set function to do some thing you need when select (name dosen't effect)
 	def show_selected_value_spinner(self,spinner, text):
 		self.selected_device=text
 		self.getDevices()
 
 	def show_selected_value_list(self,ad):
-		print (ad.selection[0].text)	
+		try:
+			global textofDeviceStudent
+			textofDeviceStudent=str(ad.selection[0].text)+str(self.selected_device)
+			self.manager.current = 'device_student_screen'
+			
+		except:
+			pass
+
 
 	def on_pre_enter(self):
-		self.devices_names={'PCs':'5','Data shows':'2','Microphones':'1','Kits':'3','Arduinos':'4','Bread boards':'6','ICs':'7'}
-		self.ids.Devices_Spinner.values = self.devices_names
+		global devices_names
+		devices_names ={'PCs':'5','Data shows':'2','Microphones':'1','Kits':'3','Arduinos':'4','Bread boards':'6','ICs':'7'}
+		self.ids.Devices_Spinner.values = devices_names
 		self.ids.Devices_Spinner.bind(text=self.show_selected_value_spinner)
 
 	def getDevices(self):
 		try:
-			num=self.devices_names[self.selected_device]
+			num=devices_names[self.selected_device]
 			data = requests.get('http://warehub-api.azurewebsites.net/retrive_devices/{}'.format(num))
 			data = json.loads(data.text)
 			self.my_list.adapter.data = []
@@ -140,25 +166,6 @@ class StudentScreen(Screen):
 				self.my_list._trigger_reset_populate()
 		except requests.exceptions.ConnectionError:
 			message = 'Check your internet connetcion'
-
-	def getOneDevice(self):
-		try:
-			num=self.devices_names[self.selected_device]
-			data = requests.get('http://warehub-api.azurewebsites.net/retrive_devices/{}'.format(num))
-			data = json.loads(data.text)
-			self.my_list.adapter.data = []
-			#strpre1="device number  type    location    state   rate"
-			#self.my_list.adapter.data.extend([strpre1])
-			#strpre="{}              {}      {}          {}      {}"
-			strpre="device number:{} type:{} location:{} state:{} rate:{}"
-			for s in data:
-				self.my_list.adapter.data.extend([strpre.format(s[0]%1000000,s[1],s[2],s[3],s[4]/s[5])])
-				self.my_list._trigger_reset_populate()
-		except requests.exceptions.ConnectionError:
-			message = 'Check your internet connetcion'
-
-	
-
 
 
 	
