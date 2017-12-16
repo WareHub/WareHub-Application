@@ -189,7 +189,7 @@
 			ListView:
 		        id: students_list_view
 		        adapter:
-		            ListAdapter(data=[],args_converter=lambda row_index, an_obj: {'text': an_obj,'size_hint_y': None,'height': 80}, cls=main.Student)
+		            ListAdapter(data=[],args_converter=lambda row_index, an_obj: {'text': an_obj,'size_hint_y': None,'height': 80}, cls=main.Student, selection_mode='single', allow_empty_selection=True)
 
 
 

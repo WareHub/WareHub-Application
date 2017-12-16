@@ -66,6 +66,7 @@ class Student(ListItemButton):
 
 
 class ManagerScreen(Screen):
+	
 	def show_Student(self, adapter):
 		self.manager.current = 'login_screen'
 
