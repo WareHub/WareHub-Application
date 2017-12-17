@@ -351,10 +351,11 @@
 	BoxLayout:
 		id: techbox
 		orientation: 'horizontal'
+		padding: 0, 30, 20, 30
 		BoxLayout:
 		
 			orientation: 'vertical'
-			padding: 20, 50, 20, 50
+			padding: 20, 0, 20, 0
 			spacing: 30
 
 			Button:
@@ -370,24 +371,28 @@
 
 		    Button:
 		    	text: 'Add Operating System'
+		    	on_release: root.addOS()
 
 		    Button:
 		    	text: 'Add Software'
+		    	on_release: root.addSoftware()
 
 		    Button:
 		    	text: 'Add IC Type'
+		    	on_release: root.addICType()
 
 		    Button:
 		    	text: 'See Demands'
+		    	on_release: root.getDemands()
 
 		    Button:
 		    	text: 'Sign out'
-		    	on_release:root.manager.current = 'clear_screen'; root.manager.current = 'login_screen'; root.my_list.adapter.data = []
+		    	on_release: root.manager.current = 'clear_screen'; root.manager.current = 'login_screen'; root.tech_list_view.adapter.data = []
 
 		ListView:
 	        id: tech_list_view
 	        adapter:
-	            ListAdapter(data=[],args_converter=lambda row_index, an_obj: {'text': an_obj,'size_hint_y': None,'height': 40}, cls=main.Student)
+	            ListAdapter(data=[],args_converter=lambda row_index, an_obj: {'text': an_obj,'size_hint_y': None,'height': 170}, cls=main.Student, selection_mode='single', allow_empty_selection=True)
 
 
 
@@ -427,7 +432,7 @@
 		ListView:
 	        id: students_list_view
 	        adapter:
-	            ListAdapter(data=[],args_converter=lambda row_index, an_obj: {'text': an_obj,'size_hint_y': None,'height': 160}, cls=main.Student, selection_mode='single', allow_empty_selection=True)
+	            ListAdapter(data=[],args_converter=lambda row_index, an_obj: {'text': an_obj,'size_hint_y': None,'height': 170}, cls=main.Student, selection_mode='single', allow_empty_selection=True)
 
 
 
@@ -488,6 +493,69 @@
 	    Widget:
 
 
+
+
+<AdditionScreen>:
+	BoxLayout:
+
+		orientation: 'vertical'
+		padding: 60, 50, 60, 100
+		spacing: 50
+		size: self.size
+
+
+		Widget:
+			size_hint:1, None
+			height: 100
+			
+			
+		TextInput:
+			id: name_text
+			size_hint: 1, None
+			font_size: 40
+			height: 80
+			color: 0, 0, 1, 1
+			valign: 'middle'
+			halign: 'middle'
+			background_color:[ 1, 1, 1, 1]
+			multiline: False
+			hint_text: 'Name'
+			
+			
+			
+		TextInput:
+			id: link_text
+			size_hint: 1, None
+			font_size: 40
+			height: 80 		
+	        multiline: False
+	        hint_text: 'link'
+
+
+	    Widget:
+
+			
+			
+	    Button:
+	    	size_hint: 1, None
+	    	height: 80
+	    	font_size: 40
+			text: 'Add'
+			background_color: .88, .88, .88, 1
+			on_release: root.add()
+
+		Button:
+	    	size_hint: None, None
+	    	height: 80
+	    	width: 200
+	    	font_size: 40
+			text: 'Back'
+			background_color: .88, .88, .88, 1
+			on_release: root.manager.current = 'clear_screen'; root.manager.current = 'tech_screen'
+
+
+
+
 <ClearScreen>
 	BoxLayout:
 		Widget:
@@ -544,4 +612,10 @@
 	ClearScreen:
 		id: clear_screen
 		name: 'clear_screen'
+		manager: screen_manager
+
+
+	AdditionScreen:
+		id: addition_screen
+		name: 'addition_screen'
 		manager: screen_manager
