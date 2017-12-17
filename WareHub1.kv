@@ -145,7 +145,7 @@
 	    	width: 200
 	    	font_size: 40
 			text: 'Back'
-			on_release: root.manager.current = 'manager_screen'
+			on_release:root.manager.current = 'clear_screen'; root.manager.current = 'manager_screen'
 
 	    Widget:
 
@@ -166,7 +166,7 @@
 
 			Button:
 		    	text: 'Add User'
-		    	on_release: root.manager.current = 'adduser_screen'
+		    	on_release:root.manager.current = 'clear_screen'; root.manager.current = 'adduser_screen'
 
 
 		    Button:
@@ -183,10 +183,10 @@
 
 		    Button:
 		    	text: 'Update Information'
-		    	on_release: root.manager.current = 'updateinfo_screen'
+		    	on_release:root.manager.current = 'clear_screen'; root.manager.current = 'updateinfo_screen'
 		    Button:
 		    	text: 'Sign out'
-		    	on_release: root.manager.current = 'login_screen'; root.my_list.adapter.data = []
+		    	on_release:root.manager.current = 'clear_screen'; root.manager.current = 'login_screen'; root.my_list.adapter.data = []
 
 		BoxLayout:
 			padding: 20, 70, 20, 20
@@ -203,29 +203,123 @@
 		    	text: 'Delete'
 		    	on_release: root.deleteElement()
 
+
+
+
+
 <DeviceStudentScreen>:
-	listonedevice: list_one_device
+	listonedevice: students_list_view
+
 	BoxLayout:
 		orientation: 'vertical'
+		spacing: 30
+		padding: 30
 		BoxLayout:
-		
 			orientation: 'horizontal'
-			padding: 30, 70, 30, 70
-			spacing: 30
+			spacing: 10
+			Label:
+				text: 'Start Time'
+				font_size: 30
+		    TextInput:
+				id: months_textinput	
+		        multiline: False
+		        hint_text: 'Month'
+		        font_size: 30
+		    TextInput:
+				id: days_textinput		
+		        multiline: False
+		        hint_text: 'Day'
+		        font_size: 30
 
-			Button:
-		    	text: 'Add Review'
-		    	#on_release: root.manager.current = 'adduser_screen'
+		    TextInput:
+				id: hours_textinput		
+		        multiline: False
+		        hint_text: 'Hour'
+		        font_size: 30
 
+		    TextInput:
+				id: minutess_textinput	
+		        multiline: False
+		        hint_text: 'Minutes'
+		        font_size: 30
+
+		BoxLayout:
+			orientation: 'horizontal'
+			spacing: 10
+			Label:
+				text: 'End Time'
+				font_size: 30
+		    TextInput:
+				id: monthe_textinput	
+		        multiline: False
+		        hint_text: 'Month'
+		        font_size: 30
+		    TextInput:
+				id: daye_textinput		
+		        multiline: False
+		        hint_text: 'Day'
+		        font_size: 30
+
+		    TextInput:
+				id: houre_textinput		
+		        multiline: False
+		        hint_text: 'Hour'
+		        font_size: 30
+
+		    TextInput:
+				id: minutese_textinput	
+		        multiline: False
+		        hint_text: 'Minutes'
+		        font_size: 30
+
+		Button:
+			text: 'Demand'
+			size_hint_x: None
+			font_size: 30
+			width: 300
+			on_release: root.demandDevice()
+
+		
+
+		BoxLayout:
+			orientation: 'horizontal'
+			spacing: 20
+		    TextInput:
+				id: review_textinput	
+		        hint_text: 'Review'
+		        font_size: 30
+
+		    Spinner:
+		    	id: rate_spinner
+		    	size_hint_x: None
+		    	width: 80
+		    	text: 'Rate'
+		    	values: ['1', '2', '3', '4', '5']
 
 		    Button:
-		    	text: 'Demand The Device'
-		    	#on_release: root.getStudents()
+				text: 'Add Review'
+				size_hint_x: None
+				font_size: 30
+				width: 200
+				on_release: root.addReview()
 
-		ListView:
-	        id: list_one_device
-	        adapter:
-	            ListAdapter(data=[],args_converter=lambda row_index, an_obj: {'text': an_obj,'size_hint_y': None,'height': 40}, cls=main.Student)
+
+		BoxLayout:
+			size_hint_y: None
+			height: 500
+			ListView:
+			    id: students_list_view
+		        adapter:
+		            ListAdapter(data=[],args_converter=lambda row_index, an_obj: {'text': an_obj,'size_hint_y': None,'height': 150}, cls=main.Student, selection_mode='single', allow_empty_selection=True)
+
+	    Button: 
+	    	text: 'Back'
+	    	size_hint_x: None
+			font_size: 30
+			width: 150
+			on_release:root.manager.current = 'clear_screen'; root.manager.current = 'student_screen'
+
+
 
 
 
@@ -240,7 +334,7 @@
 
 			Button:
 		    	text: 'Delete Device'
-		    	#on_release: root.manager.current = 'adduser_screen'
+		    	#on_release:root.manager.current = 'clear_screen'; root.manager.current = 'adduser_screen'
 
 		    Button:
 		    	text: 'Update Device'
@@ -265,7 +359,7 @@
 
 			Button:
 		    	text: 'Update Information'
-		    	on_release: root.manager.current = 'updateinfo_screen'
+		    	on_release:root.manager.current = 'clear_screen'; root.manager.current = 'updateinfo_screen'
 
 		    Spinner:
 		    	text: 'Get Devices'
@@ -288,7 +382,7 @@
 
 		    Button:
 		    	text: 'Sign out'
-		    	on_release: root.manager.current = 'login_screen'; root.my_list.adapter.data = []
+		    	on_release:root.manager.current = 'clear_screen'; root.manager.current = 'login_screen'; root.my_list.adapter.data = []
 
 		ListView:
 	        id: tech_list_view
@@ -302,21 +396,23 @@
 	BoxLayout:
 		id: studentbox
 		orientation: 'horizontal'
+		padding: 0, 50, 20, 50
 		BoxLayout:
 		
 			orientation: 'vertical'
-			padding: 30, 100, 30, 100
+			padding: 30, 50, 30, 50
 			spacing: 40
 
 			Button:
 		    	text: 'Update Information'
-		    	on_release: root.manager.current = 'updateinfo_screen'
+		    	on_release:root.manager.current = 'clear_screen'; root.manager.current = 'updateinfo_screen'
 
 		    Button:
 		    	text: 'Demand Device'
 
 		    Button:
 		    	text: 'My Demands'
+		    	on_release: root.getDemands()
 
 		    Spinner:
 		    	text: 'Get Devices'
@@ -326,12 +422,15 @@
 
 		    Button:
 		    	text: 'Sign out'
-		    	on_release: root.manager.current = 'login_screen'; root.my_list.adapter.data = []
+		    	on_release:root.manager.current = 'clear_screen'; root.manager.current = 'login_screen'; root.my_list.adapter.data = []
 			
 		ListView:
 	        id: students_list_view
 	        adapter:
-	            ListAdapter(data=[],args_converter=lambda row_index, an_obj: {'text': an_obj,'size_hint_y': None,'height': 40}, cls=main.Student)
+	            ListAdapter(data=[],args_converter=lambda row_index, an_obj: {'text': an_obj,'size_hint_y': None,'height': 160}, cls=main.Student, selection_mode='single', allow_empty_selection=True)
+
+
+
 
 
 <UpdateInfoScreen>:
@@ -383,14 +482,15 @@
 	    	width: 200
 	    	font_size: 40
 			text: 'Back'
-			on_release: root.manager.current = root.backButton()
+			on_release:root.manager.current = 'clear_screen'; root.manager.current = root.backButton()
 
 
 	    Widget:
 
 
-
-
+<ClearScreen>
+	BoxLayout:
+		Widget:
 
 
 <ScreenManagment>:
@@ -439,4 +539,9 @@
 	TechScreen:
 		id: tech_screen
 		name: 'tech_screen'
+		manager: screen_manager
+
+	ClearScreen:
+		id: clear_screen
+		name: 'clear_screen'
 		manager: screen_manager
