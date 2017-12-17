@@ -368,6 +368,7 @@
 
 		    Button:
 		    	text: 'Add Device'
+		    	on_release: root.manager.current = 'clear_screen'; root.manager.current = 'adddevice_screen'
 
 		    Button:
 		    	text: 'Add Operating System'
@@ -555,6 +556,38 @@
 
 
 
+<AddDeviceScreen>
+	BoxLayout:
+		orientation: 'vertical'
+		padding: 20
+		spacing: 60
+		BoxLayout:
+			spacing: 20
+			padding: 20
+			orientation: 'horizontal'
+			Spinner:
+				text: 'Type'
+				values: ['PCs','Data shows','Microphones','Kits','Arduinos','Bread boards','ICs']
+			Spinner:
+				text: 'location'
+				values: ['1', '2', '3', '4']
+			Spinner:
+				text: 'Status'
+				values: ['0', '1']
+
+		Widget:
+			size_hint_y: None
+			height: 700
+		Button:
+			text: 'Add'
+		Button:
+			text: 'Back'
+			size_hint_x: None
+			width: 200
+			on_release: root.manager.current = 'clear_screen'; root.manager.current = 'tech_screen'
+
+
+
 
 <ClearScreen>
 	BoxLayout:
@@ -618,4 +651,9 @@
 	AdditionScreen:
 		id: addition_screen
 		name: 'addition_screen'
+		manager: screen_manager
+
+	AddDeviceScreen:
+		id: adddevice_screen
+		name: 'adddevice_screen'
 		manager: screen_manager

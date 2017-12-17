@@ -91,6 +91,7 @@ class Student(ListItemButton):
 
 
 class ManagerScreen(Screen):
+	mode = -1
 	
 	def deleteElement(self):
 		if self.mode == 0:
@@ -254,7 +255,7 @@ class StudentScreen(Screen):
 			data = requests.get('http://warehub-api.azurewebsites.net/retrive_devices/{}'.format(num))
 			data = json.loads(data.text)
 			self.my_list.adapter.data = []
-			strpre="device number:{} type:{} location:{} state:{} rate:{}"
+			strpre="ID: {}\nType: {}    location: {}\nstate: {}    rate: {}"
 			self.my_list.adapter.bind(on_selection_change=self.my_list_functionalities)
 			self.mode = 0
 			for s in data:
@@ -457,7 +458,7 @@ class TechScreen(Screen):
 			data = json.loads(data.text)
 			self.mode = 0
 			self.tech_list_view.adapter.data = []
-			strpre="device number:{} type:{} location:{} state:{} rate:{}"
+			strpre="ID: {}\nType: {}    location:{}\nstate: {}     rate: {}"
 			self.tech_list_view.adapter.bind(on_selection_change=self.my_list_functionalities)
 			for s in data:
 				self.tech_list_view.adapter.data.extend([strpre.format(s[0],s[1],s[2],s[3],s[4]/s[5])])
@@ -508,6 +509,17 @@ class TechScreen(Screen):
 
 class ClearScreen(Screen):
 	pass
+
+
+
+
+
+
+class AddDeviceScreen(Screen):
+	pass
+
+
+
 
 
 class AdditionScreen(Screen):
