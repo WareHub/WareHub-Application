@@ -91,7 +91,6 @@ class Student(ListItemButton):
 
 
 class ManagerScreen(Screen):
-	mode = -1
 	
 	def deleteElement(self):
 		if self.mode == 0:
