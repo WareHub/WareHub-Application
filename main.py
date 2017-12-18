@@ -91,6 +91,7 @@ class Student(ListItemButton):
 
 
 class ManagerScreen(Screen):
+	mode = -1
 	
 	def deleteElement(self):
 		if self.mode == 0:
@@ -229,7 +230,7 @@ class StudentScreen(Screen):
 			try:
 				global textofDeviceStudent,devices_names, deviceID
 				textofDeviceStudent=str(ad.selection[0].text)+str(devices_names[self.selected_device])
-				deviceID = int(textofDeviceStudent[14:22])
+				deviceID = int(textofDeviceStudent[4:12])
 				self.manager.current = 'clear_screen'
 				self.manager.current = 'device_student_screen'
 				
@@ -422,7 +423,7 @@ class TechScreen(Screen):
 			try:
 				global textofDeviceStudent,devices_names, deviceID
 				textofDeviceStudent=str(ad.selection[0].text)+str(devices_names[self.selected_device])
-				deviceID = int(textofDeviceStudent[14:22])
+				deviceID = int(textofDeviceStudent[4:12])
 				self.manager.current = 'clear_screen'
 				self.manager.current = 'device_tech_screen'
 				
