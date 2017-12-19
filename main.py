@@ -274,7 +274,7 @@ class StudentScreen(Screen):
 			self.mode = 1
 			self.my_list.adapter.data = []
 			for item in data:
-				self.my_list.adapter.data.extend(['ID: {}\nST: {}\nET: {}\nReserved: {}   In Use: {}'.format(item[1], item[2], item[3], item[4], item[5])])
+				self.my_list.adapter.data.extend(['ID: {}\nST: {}\nET: {}\nReserved: {}\nIn Use: {}'.format(item[1], item[2], item[3], item[4], item[5])])
 				self.my_list._trigger_reset_populate()
 			popup = Popup(title='', content=Label(text='Click on any demand to be deleted'), size_hint=(None, None), size = (500, 200))
 			popup.open()
@@ -414,12 +414,31 @@ class DeviceTechScreen(Screen):
 class TechScreen(Screen):
 	selected_device=""
 	##set function to do some thing you need when select (name dosen't effect)
+	mode = -1
+	
+	def deleteElement(self):
+		if self.mode == 0:
+			if self.tech_list_view.adapter.selection:
+				text = self.tech_list_view.adapter.selection[0].text
+				id = text[4:12]
+				try:
+					payload = {'id':[id]}
+					requests.post('http://warehub-api.azurewebsites.net/remove_Device', data = payload)
+					self.tech_list_view.adapter.data.remove(text)
+					self.tech_list_view._trigger_reset_populate()
+				except requests.exceptions.ConnectionError:
+					message = 'Check your internet connetcion'
+					popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+					popup.open()
+
+
+
 	def show_selected_value_spinner(self,spinner, text):
 		self.selected_device=text
 		self.getDevices()
 
 	def my_list_functionalities(self,ad):
-		if self.mode == 0:
+		'''if self.mode == 0:
 			try:
 				global textofDeviceStudent,devices_names, deviceID
 				textofDeviceStudent=str(ad.selection[0].text)+str(devices_names[self.selected_device])
@@ -428,8 +447,8 @@ class TechScreen(Screen):
 				self.manager.current = 'device_tech_screen'
 				
 			except:
-				pass
-		elif self.mode == 1:
+				pass'''
+		if self.mode == 1:
 			if ad.selection:
 				text = self.tech_list_view.adapter.selection[0].text
 				try:
@@ -459,7 +478,7 @@ class TechScreen(Screen):
 			self.mode = 0
 			self.tech_list_view.adapter.data = []
 			strpre="ID: {}\nType: {}    location:{}\nstate: {}     rate: {}"
-			self.tech_list_view.adapter.bind(on_selection_change=self.my_list_functionalities)
+			#self.tech_list_view.adapter.bind(on_selection_change=self.my_list_functionalities)
 			for s in data:
 				self.tech_list_view.adapter.data.extend([strpre.format(s[0],s[1],s[2],s[3],s[4]/s[5])])
 				self.tech_list_view._trigger_reset_populate()

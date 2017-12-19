@@ -9,21 +9,20 @@
 	BoxLayout:
 
 		orientation: 'vertical'
-		padding: 60, 50, 60, 100
+		padding: 30, 30, 30, 50
 		spacing: 50
 		size: self.size
 
 
 		Widget:
-			size_hint:1, None
-			height: 100
+			size_hint: 1, 0.2
+			
 			
 			
 		TextInput:
 			id: username_text
-			size_hint: 1, None
+			size_hint: 1, 0.18
 			font_size: 40
-			height: 80
 			color: 0, 0, 1, 1
 			valign: 'middle'
 			halign: 'middle'
@@ -35,9 +34,8 @@
 			
 		TextInput:
 			id: password_text
-			size_hint: 1, None
-			font_size: 40
-			height: 80 		
+			size_hint: 1, 0.18
+			font_size: 40	
 	        multiline: False
 	        password: True
 	        hint_text: 'password'
@@ -48,8 +46,7 @@
 			
 			
 	    Button:
-	    	size_hint: 1, None
-	    	height: 80
+	    	size_hint: 1, 0.18
 	    	font_size: 40
 			text: 'Login'
 			background_color: .88, .88, .88, 1
@@ -63,14 +60,13 @@
 
 		orientation: 'vertical'
 		padding: 50, 50, 50, 50
-		spacing: 20
+		spacing: 50
 		
 			
 		TextInput:
 			id: name_text
-			size_hint: 1, None
+			size_hint: 1, 0.3
 			font_size: 40
-			height: 80
 			multiline: False
 			hint_text: 'name'
 			
@@ -78,16 +74,15 @@
 			
 		TextInput:
 			id: password_text
-			size_hint: 1, None
-			font_size: 40
-			height: 80 		
+			size_hint: 1, 0.3
+			font_size: 40	
 	        multiline: False
 	        password: True
 	        hint_text: 'password'
 
 	    TextInput:
 			id: phone_text
-			size_hint: 1, None
+			size_hint: 1, 0.3
 			font_size: 40
 			height: 80 		
 	        multiline: False
@@ -95,13 +90,16 @@
 
 	    TextInput:
 			id: points_text
-			size_hint: 1, None
+			size_hint: 1, 0.3
 			font_size: 40
 			height: 80 		
 	        multiline: False
 	        hint_text: 'points'
 
+
+
 	    BoxLayout:
+	    	size_hint: 1, 0.2
 	    	CheckBox:
 	    		id: manager_radiobutton
 	    		group: True
@@ -122,6 +120,7 @@
 	    		font_size: 30
 
 	    BoxLayout:
+	    	size_hint : 1, 0.2
 	    	CheckBox:
 	    		id: ta_checkbox
 	    	Label:
@@ -129,25 +128,24 @@
 	    		font_size: 30
 
 	    Widget:
+	    	size_hine: 1, 0.15
 
 	    Button:
-	    	size_hint: 1, None
+	    	size_hint: 1, 0.3
 	    	height: 80
 	    	font_size: 40
 			text: 'Add User'
 			on_release: root.insertUser()
 
-		Widget:
 
 		Button:
-	    	size_hint: None, None
+	    	size_hint: 0.3, 0.3
 	    	height: 80	
 	    	width: 200
 	    	font_size: 40
 			text: 'Back'
 			on_release:root.manager.current = 'clear_screen'; root.manager.current = 'manager_screen'
 
-	    Widget:
 
 
 
@@ -162,7 +160,7 @@
 		
 			orientation: 'vertical'
 			padding: 30, 70, 30, 70
-			spacing: 50
+			spacing: 70
 
 			Button:
 		    	text: 'Add User'
@@ -176,10 +174,6 @@
 		    Button:
 		    	text: 'Get Technicians'
 		    	on_release: root.getTechs()
-
-		    Button:
-		    	text: 'Get Devices'
-		    	on_release: root.getDevices()
 
 		    Button:
 		    	text: 'Update Information'
@@ -390,10 +384,20 @@
 		    	text: 'Sign out'
 		    	on_release: root.manager.current = 'clear_screen'; root.manager.current = 'login_screen'; root.tech_list_view.adapter.data = []
 
-		ListView:
-	        id: tech_list_view
-	        adapter:
-	            ListAdapter(data=[],args_converter=lambda row_index, an_obj: {'text': an_obj,'size_hint_y': None,'height': 170}, cls=main.Student, selection_mode='single', allow_empty_selection=True)
+		BoxLayout:
+			padding: 20, 70, 20, 20
+			orientation: 'vertical'
+			spacing: 20
+			ListView:
+		        id: tech_list_view
+		        adapter:
+		            ListAdapter(data=[],args_converter=lambda row_index, an_obj: {'text': an_obj,'size_hint_y': None,'height': 160}, cls=main.Student, selection_mode='single', allow_empty_selection=True)
+
+		    Button:
+		    	size_hint_y: None
+		    	height: 60
+		    	text: 'Delete'
+		    	on_release: root.deleteElement()
 
 
 
@@ -407,14 +411,12 @@
 		
 			orientation: 'vertical'
 			padding: 30, 50, 30, 50
-			spacing: 40
+			spacing: 70
 
 			Button:
 		    	text: 'Update Information'
 		    	on_release:root.manager.current = 'clear_screen'; root.manager.current = 'updateinfo_screen'
 
-		    Button:
-		    	text: 'Demand Device'
 
 		    Button:
 		    	text: 'My Demands'
@@ -433,7 +435,7 @@
 		ListView:
 	        id: students_list_view
 	        adapter:
-	            ListAdapter(data=[],args_converter=lambda row_index, an_obj: {'text': an_obj,'size_hint_y': None,'height': 170}, cls=main.Student, selection_mode='single', allow_empty_selection=True)
+	            ListAdapter(data=[],args_converter=lambda row_index, an_obj: {'text': an_obj,'size_hint_y': None,'height': 200}, cls=main.Student, selection_mode='single', allow_empty_selection=True)
 
 
 
