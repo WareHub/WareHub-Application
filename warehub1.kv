@@ -16,7 +16,7 @@
 
 		Widget:
 			size_hint: 1, 0.2
-			
+
 			
 			
 		TextInput:
@@ -28,9 +28,7 @@
 			halign: 'middle'
 			background_color:[ 1, 1, 1, 1]
 			multiline: False
-			hint_text: 'ID'
-			
-			
+			hint_text: 'ID'			
 			
 		TextInput:
 			id: password_text
@@ -96,8 +94,6 @@
 	        multiline: False
 	        hint_text: 'points'
 
-
-
 	    BoxLayout:
 	    	size_hint: 1, 0.2
 	    	CheckBox:
@@ -137,7 +133,6 @@
 			text: 'Add User'
 			on_release: root.insertUser()
 
-
 		Button:
 	    	size_hint: 0.3, 0.3
 	    	height: 80	
@@ -145,7 +140,6 @@
 	    	font_size: 40
 			text: 'Back'
 			on_release:root.manager.current = 'clear_screen'; root.manager.current = 'manager_screen'
-
 
 
 
@@ -178,6 +172,7 @@
 		    Button:
 		    	text: 'Update Information'
 		    	on_release:root.manager.current = 'clear_screen'; root.manager.current = 'updateinfo_screen'
+
 		    Button:
 		    	text: 'Sign out'
 		    	on_release:root.manager.current = 'clear_screen'; root.manager.current = 'login_screen'; root.my_list.adapter.data = []
@@ -417,7 +412,6 @@
 		    	text: 'Update Information'
 		    	on_release:root.manager.current = 'clear_screen'; root.manager.current = 'updateinfo_screen'
 
-
 		    Button:
 		    	text: 'My Demands'
 		    	on_release: root.getDemands()
@@ -562,30 +556,87 @@
 	BoxLayout:
 		orientation: 'vertical'
 		padding: 20
-		spacing: 60
+		spacing: 70
+
+
 		BoxLayout:
 			spacing: 20
 			padding: 20
+			size_hint: 1, 0.2
 			orientation: 'horizontal'
 			Spinner:
+				id: type_spinner
 				text: 'Type'
 				values: ['PCs','Data shows','Microphones','Kits','Arduinos','Bread boards','ICs']
 			Spinner:
+				id: location_sppiner
 				text: 'location'
 				values: ['1', '2', '3', '4']
 			Spinner:
+				id: state_sppiner
 				text: 'Status'
 				values: ['0', '1']
 
+		BoxLayout:
+			size_hint: 1, 0.2
+			spacing: 10
+			TextInput:
+				id: label_addDev_text
+				font_size: 40	
+				multiline: False
+				password: False
+				hint_text: 'Label'
+				
+			
+			TextInput:
+				id: dtype_addDev_text
+				font_size: 40	
+				multiline: False
+				password: False
+				hint_text: 'Device sub type'
+			
+			TextInput:
+				id: CPU_addDev_text
+				font_size: 40	
+				multiline: False
+				password: False
+				hint_text: 'CPU'
+				opacity: 0				
+
+			TextInput:
+				id: GPU_addDev_text
+				font_size: 40	
+				multiline: False
+				password: False
+				hint_text: 'GPU'
+				opacity: 0				
+			
+			TextInput:
+				id: RAM_addDev_text
+				font_size: 40
+				multiline: False
+				password: False
+				hint_text: 'RAM'
+				opacity: 0				
+			
+			TextInput:
+				id: Code_addDev_text
+				font_size: 40
+				multiline: False
+				password: False
+				hint_text: 'IC Code'
+				opacity: 0				
+			
 		Widget:
-			size_hint_y: None
-			height: 700
+			size_hint_y: 0.5
 		Button:
+			size_hint: 1, 0.2
 			text: 'Add'
+			on_release: root.adddevice()
+
 		Button:
 			text: 'Back'
-			size_hint_x: None
-			width: 200
+			size_hint: 0.4, 0.2
 			on_release: root.manager.current = 'clear_screen'; root.manager.current = 'tech_screen'
 
 
