@@ -15,28 +15,33 @@ from kivy.lang import Builder
 from kivy.properties import ObjectProperty, NumericProperty
 from kivy.uix.listview import ListItemButton
 from kivy.uix.checkbox import CheckBox
+from kivy.uix.popup import Popup
+from kivy.uix.floatlayout import FloatLayout
 
 from kivy.uix.spinner import Spinner
 from kivy.uix.dropdown import DropDown
 from kivy.uix.button import Button
 from kivy.base import runTouchApp
+from kivy.core.window import Window
 
 import json
-
+import datetime
 
 
 ID = 0
 myPassword = ''
 myType = -1
 textofDeviceStudent=""
+deviceID = 0
 devices_names ={'PCs':'5','Data shows':'2','Microphones':'1','Kits':'3','Arduinos':'4','Bread boards':'6','ICs':'7'}
+additionScreenMode = -1
 
 class LoginScreen(Screen):
 
     def login(self):
     	userName = self.ids.username_text.text
     	password = self.ids.password_text.text
-    	self.manager.current = 'tech_screen'
+    	#self.manager.current = 'student_screen'
     	if len(userName)>0 and len(password)>0:
     		try:
     			idUser = int(userName)
@@ -49,20 +54,31 @@ class LoginScreen(Screen):
     			myPassword = password
     			myType = isLoggedin
     			if (isLoggedin == 0):
+    				self.manager.current = 'clear_screen'
     				self.manager.current = 'manager_screen'
     			elif isLoggedin == 1:
+    				self.manager.current = 'clear_screen'
     				self.manager.current = 'student_screen'
     			elif isLoggedin == 2:
+    				self.manager.current = 'clear_screen'
     				self.manager.current = 'tech_screen'
     			else:
     				message = 'ID or password is not correct'
+    				popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+    				popup.open()
     		except ValueError:
     			message = 'invalid id'
-    			print ('here')
+    			popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+    			popup.open()
+
     		except requests.exceptions.ConnectionError:
     			message = 'Check your internet connetcion'
+    			popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+    			popup.open()
     	else:
     		message = 'please enter your id and password'
+    		popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+    		popup.open()
 
 
 
@@ -75,16 +91,36 @@ class Student(ListItemButton):
 
 
 class ManagerScreen(Screen):
+	mode = -1
+	
+	def deleteElement(self):
+		if self.mode == 0:
+			if self.my_list.adapter.selection:
+				text = self.my_list.adapter.selection[0].text
+				id = text[4:12]
+				try:
+					requests.delete('http://warehub-api.azurewebsites.net/deleteuser/{}'.format(id))
+					self.my_list.adapter.data.remove(text)
+					self.my_list._trigger_reset_populate()
+				except requests.exceptions.ConnectionError:
+					message = 'Check your internet connetcion'
+					popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+					popup.open()
+		
+
 	def getStudents(self):
 		try:
 			data = requests.get('http://warehub-api.azurewebsites.net/getstudents')
 			data = json.loads(data.text)
 			self.my_list.adapter.data = []
 			for s in data:
-				self.my_list.adapter.data.extend([s[1]])
+				self.my_list.adapter.data.extend(['ID: {}\n{}\nPhone: {}\nIsTA: {}     Points: {}'.format(s[0], s[1], s[2], s[3], s[4])])
 				self.my_list._trigger_reset_populate()
+			self.mode = 0
 		except requests.exceptions.ConnectionError:
 			message = 'Check your internet connetcion'
+			popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+			popup.open()
 
 	def getTechs(self):
 		try:
@@ -92,28 +128,94 @@ class ManagerScreen(Screen):
 			data = json.loads(data.text)
 			self.my_list.adapter.data = []
 			for s in data:
-				self.my_list.adapter.data.extend([s[1]])
+				self.my_list.adapter.data.extend(['ID: {}\n{}\nPhone: {}\nPoints: {}'.format(s[0], s[1], s[2], s[3])])
 				self.my_list._trigger_reset_populate()
+			self.mode = 0
 		except requests.exceptions.ConnectionError:
 			message = 'Check your internet connetcion'
+			popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+			popup.open()
+
+
+
+
 
 class DeviceStudentScreen(Screen):
 	def on_pre_enter(self):
 		try:
-			self.id=textofDeviceStudent.split(" type")[0][14:]
-			num=textofDeviceStudent[-1:]
-			print(textofDeviceStudent,num)
-			self.id=num*1000000+id
-			data = requests.get('http://warehub-api.azurewebsites.net/getdevicereviews/{}'.format(id))
+			data = requests.get('http://warehub-api.azurewebsites.net/getdevicereviews/{}'.format(deviceID))
 			data = json.loads(data.text)
 			self.listonedevice.adapter.data = []
-			self.listonedevice.adapter.data.extend([textofDeviceStudent[:-1]])
-			strpre="time:{} opinion:{} rate:{}"
+			strpre="Time: {}\nOpinion: {}\nRate: {}"
 			for s in data:
-				self.listonedevice.adapter.data.extend([str(s[2]),str(s[3]),str(s[4])])
+				self.listonedevice.adapter.data.extend([strpre.format(str(s[2]),str(s[3]),str(s[4]))])
 				self.listonedevice._trigger_reset_populate()
 		except requests.exceptions.ConnectionError:
 			message = 'Check your internet connetcion'
+			popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+			popup.open()
+	
+
+
+	def addReview(self):
+		text = self.ids.review_textinput.text
+		rate = self.ids.rate_spinner.text
+		if rate != 'Rate':
+			try:
+				currentDate = datetime.datetime.now()
+				payload = {'': [str(ID), str(deviceID), str(currentDate), text, rate]}
+				requests.post('http://warehub-api.azurewebsites.net/insertreview', data = payload)
+				payload = {'id': str(deviceID), 'r': rate}
+				requests.post('http://warehub-api.azurewebsites.net/update_devicerate', data = payload)
+				self.on_pre_enter()
+			except requests.exceptions.ConnectionError:
+				message = 'Check your internet connetcion'
+				popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+				popup.open()
+		else:
+			message = 'please choose a rate'
+			popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+			popup.open()
+
+
+	def demandDevice(self):
+		months = self.ids.months_textinput.text
+		days = self.ids.days_textinput.text
+		hours = self.ids.hours_textinput.text
+		minutess = self.ids.minutess_textinput.text
+		monthe = self.ids.monthe_textinput.text
+		daye = self.ids.daye_textinput.text
+		houre = self.ids.houre_textinput.text
+		minutese = self.ids.minutese_textinput.text
+		if len(months) > 0 and len(days) > 0 and len(hours) > 0 and len(minutess) > 0 and len(monthe) > 0 and len(daye) > 0 and len(houre) > 0 and len(minutese) > 0:
+			try:
+				sDate1 = int(months)
+				sDate2 = int(days)
+				sDate3 = int(hours)
+				sDate4 = int(minutess)
+				eDate1 = int(monthe)
+				eDate2 = int(daye)
+				eDate3 = int(houre)
+				eDate4 = int(minutese)
+				currentYear = datetime.datetime.now().year
+				startDate = datetime.datetime(currentYear, sDate1, sDate2, sDate3, sDate4)
+				endDate = datetime.datetime(currentYear, eDate1, eDate2, eDate3, eDate4)
+				payload = {'': [str(ID), str(deviceID), str(startDate), str(endDate)]}
+				data = requests.post('http://warehub-api.azurewebsites.net/insertdemand', data = payload)
+			except ValueError:
+				message = 'please enter logical values'
+				popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+				popup.open()
+			except requests.exceptions.ConnectionError:
+				message = 'Check your internet connetcion'
+				popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+				popup.open()
+		else:
+			message = "please enter all values"
+			popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+			popup.open()
+
+
 
 
 class StudentScreen(Screen):
@@ -123,15 +225,23 @@ class StudentScreen(Screen):
 		self.selected_device=text
 		self.getDevices()
 
-	def show_selected_value_list(self,ad):
-		try:
-			global textofDeviceStudent,devices_names
-			textofDeviceStudent=str(ad.selection[0].text)+str(devices_names[self.selected_device])
-			self.ids.studentbox.clear_widgets()
-			self.manager.current = 'device_student_screen'
-			
-		except:
-			pass
+	def my_list_functionalities(self,ad):
+		if self.mode == 0:
+			try:
+				global textofDeviceStudent,devices_names, deviceID
+				textofDeviceStudent=str(ad.selection[0].text)+str(devices_names[self.selected_device])
+				deviceID = int(textofDeviceStudent[14:22])
+				self.manager.current = 'clear_screen'
+				self.manager.current = 'device_student_screen'
+				
+			except:
+				pass
+		elif self.mode == 1:
+			if ad.selection:
+				text = self.my_list.adapter.selection[0].text
+				self.deleteDemand(text)
+				
+
 
 
 	def on_pre_enter(self):
@@ -145,17 +255,48 @@ class StudentScreen(Screen):
 			data = requests.get('http://warehub-api.azurewebsites.net/retrive_devices/{}'.format(num))
 			data = json.loads(data.text)
 			self.my_list.adapter.data = []
-			strpre="device number:{} type:{} location:{} state:{} rate:{}"
-			self.my_list.adapter.bind(on_selection_change=self.show_selected_value_list)
+			strpre="ID: {}\nType: {}    location: {}\nstate: {}    rate: {}"
+			self.my_list.adapter.bind(on_selection_change=self.my_list_functionalities)
+			self.mode = 0
 			for s in data:
-				self.my_list.adapter.data.extend([strpre.format(s[0]%1000000,s[1],s[2],s[3],s[4]/s[5])])
+				self.my_list.adapter.data.extend([strpre.format(s[0],s[1],s[2],s[3],s[4]/s[5])])
 				self.my_list._trigger_reset_populate()
 		except requests.exceptions.ConnectionError:
 			message = 'Check your internet connetcion'
+			popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+			popup.open()
 
+	def getDemands(self):
+		try:
+			data = requests.get('http://warehub-api.azurewebsites.net/retrievedemand_st/{}'.format(ID))
+			data = json.loads(data.text)
+			self.my_list.adapter.bind(on_selection_change=self.my_list_functionalities)
+			self.mode = 1
+			self.my_list.adapter.data = []
+			for item in data:
+				self.my_list.adapter.data.extend(['ID: {}\nST: {}\nET: {}\nReserved: {}   In Use: {}'.format(item[1], item[2], item[3], item[4], item[5])])
+				self.my_list._trigger_reset_populate()
+			popup = Popup(title='', content=Label(text='Click on any demand to be deleted'), size_hint=(None, None), size = (500, 200))
+			popup.open()
+		except requests.exceptions.ConnectionError:
+			message = 'Check your internet connetcion'
+			popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+			popup.open()
+			
 
-	
-
+	def deleteDemand(self, text):
+		try:
+			text1 = text.split('\n')
+			dID = text1[0][3:]
+			sTime = text1[1][3:]
+			payload = {'': [str(ID), dID, sTime]}
+			requests.post('http://warehub-api.azurewebsites.net/deletedemand_st', data = payload)
+			self.my_list.adapter.data.remove(text)
+			self.my_list._trigger_reset_populate()
+		except requests.exceptions.ConnectionError:
+			message = 'Check your internet connetcion'
+			popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+			popup.open()
 
 
 	
@@ -180,16 +321,24 @@ class AddUserScreen(Screen):
 					typeUser = 2
 				else:
 					message = 'please enter user type'
+					popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+					popup.open()
 					return
 				payload = {'': [str(typeUser), name, password, phone, str(isTA), str(points)]}
 				print (payload)
 				requests.post('http://warehub-api.azurewebsites.net/insertuser', data = payload)
 			except ValueError:
 				message = 'Enter valid information'
+				popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+				popup.open()
 			except requests.exceptions.ConnectionError:
 				message = 'Check your internet connetcion'
+				popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+				popup.open()
 		else:
 			message = 'Please enter all information of user'
+			popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+			popup.open()
 
 
 class UpdateInfoScreen(Screen):
@@ -209,6 +358,8 @@ class UpdateInfoScreen(Screen):
 			self.ids.phone_text.text = str(data[0][2])
 		except requests.exceptions.ConnectionError:
 			message = 'Check your internet connetcion'
+			popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+			popup.open()
 
 	def updateInfo(self):
 		password = self.ids.password_text.text
@@ -220,16 +371,23 @@ class UpdateInfoScreen(Screen):
 				myPassword = password
 			except requests.exceptions.ConnectionError:
 				message = 'check your internet connection'
+				popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+				popup.open()
 		else:
 			message = 'please enter your password and phone'
+			popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+			popup.open()
 
 
 	def backButton(self):
 		if myType == 0:
+			self.manager.current = 'clear_screen'
 			self.manager.current = 'manager_screen'
 		elif myType == 1:
+			self.manager.current = 'clear_screen'
 			self.manager.current = 'student_screen'
 		else:
+			self.manager.current = 'clear_screen'
 			self.manager.current = 'tech_screen'
 
 class DeviceTechScreen(Screen):
@@ -249,6 +407,8 @@ class DeviceTechScreen(Screen):
 				self.ids.one_device_Tech._trigger_reset_populate()
 		except requests.exceptions.ConnectionError:
 			message = 'Check your internet connetcion'
+			popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+			popup.open()
 
 
 class TechScreen(Screen):
@@ -258,15 +418,32 @@ class TechScreen(Screen):
 		self.selected_device=text
 		self.getDevices()
 
-	def show_selected_value_list(self,ad):
-		try:
-			global textofDeviceStudent,devices_names
-			textofDeviceStudent=str(ad.selection[0].text)+str(devices_names[self.selected_device])
-			self.ids.techbox.clear_widgets()
-			self.manager.current = 'device_tech_screen'
-			
-		except:
-			pass
+	def my_list_functionalities(self,ad):
+		if self.mode == 0:
+			try:
+				global textofDeviceStudent,devices_names, deviceID
+				textofDeviceStudent=str(ad.selection[0].text)+str(devices_names[self.selected_device])
+				deviceID = int(textofDeviceStudent[14:22])
+				self.manager.current = 'clear_screen'
+				self.manager.current = 'device_tech_screen'
+				
+			except:
+				pass
+		elif self.mode == 1:
+			if ad.selection:
+				text = self.tech_list_view.adapter.selection[0].text
+				try:
+					text1 = text.split('\n')
+					sID = text1[0][5:]
+					dID = text1[1][5:]
+					sDate = text1[2][4:]
+					payload = {'': [sID, dID, sDate]}
+					requests.post('http://warehub-api.azurewebsites.net/setinuse', data = payload)
+				except requests.exceptions.ConnectionError:
+					message = 'check your internet connection'
+					popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+					popup.open()
+
 
 
 	def on_pre_enter(self):
@@ -279,19 +456,202 @@ class TechScreen(Screen):
 			num=devices_names[self.selected_device]
 			data = requests.get('http://warehub-api.azurewebsites.net/retrive_devices/{}'.format(num))
 			data = json.loads(data.text)
+			self.mode = 0
 			self.tech_list_view.adapter.data = []
-			strpre="device number:{} type:{} location:{} state:{} rate:{}"
-			self.tech_list_view.adapter.bind(on_selection_change=self.show_selected_value_list)
+			strpre="ID: {}\nType: {}    location:{}\nstate: {}     rate: {}"
+			self.tech_list_view.adapter.bind(on_selection_change=self.my_list_functionalities)
 			for s in data:
-				self.tech_list_view.adapter.data.extend([strpre.format(s[0]%1000000,s[1],s[2],s[3],s[4]/s[5])])
+				self.tech_list_view.adapter.data.extend([strpre.format(s[0],s[1],s[2],s[3],s[4]/s[5])])
 				self.tech_list_view._trigger_reset_populate()
 		except requests.exceptions.ConnectionError:
 			message = 'Check your internet connetcion'
+			popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+			popup.open()
+
+	def getDemands(self):
+		try:
+			data = requests.get('http://warehub-api.azurewebsites.net/retrievedemand_tech/{}'.format(ID))
+			data = json.loads(data.text)
+			self.tech_list_view.adapter.bind(on_selection_change=self.my_list_functionalities)
+			self.mode = 1
+			self.tech_list_view.adapter.data = []
+			for item in data:
+				self.tech_list_view.adapter.data.extend(['sID: {}\ndID: {}\nST: {}\nET: {}\nReserved: {}   In Use: {}'.format(item[0], item[1], item[2], item[3], item[4], item[5])])
+				self.tech_list_view._trigger_reset_populate()
+			popup = Popup(title='', content=Label(text='Click on any demand to Accept it'), size_hint=(None, None), size = (500, 200))
+			popup.open()
+		except requests.exceptions.ConnectionError:
+			message = 'Check your internet connetcion'
+			popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+			popup.open()
+
+
+	def addOS(self):
+		global additionScreenMode
+		additionScreenMode = 0
+		self.manager.current = 'clear_screen'
+		self.manager.current = 'addition_screen'
+
+	def addSoftware(self):
+		global additionScreenMode
+		additionScreenMode = 1
+		self.manager.current = 'clear_screen'
+		self.manager.current = 'addition_screen'
+
+
+	def addICType(self):
+		global additionScreenMode
+		additionScreenMode = 2
+		self.manager.current = 'clear_screen'
+		self.manager.current = 'addition_screen'
+
+
+
+class ClearScreen(Screen):
+	pass
+
+
+
+
+
+
+class AddDeviceScreen(Screen):
+	def show_selected_value_spinner(self,text):
+		for text in self.texts:
+			text.opacity=0
+
+		global devices_names
+		device_id = devices_names[text]
+		if (device_id==5):
+			texts[0].opacity=1
+			texts[1].opacity=1
+			texts[2].opacity=1
+		elif (device_id==7):
+			texts[3].opacity=1
+	
+	def show_spinner_state(self,text):
+		self.state=text
+	def show_spinner_location(self,text):
+		self.location=text        		
+	def on_pre_enter (self):
+		self.device_id =0
+		self.state=10
+		self.location=10
+		self.texts=[self.ids.RAM_addDev_text,self.ids.GPU_addDev_text.opacity,self.ids.CPU_addDev_text.opacity,self.ids.Code_addDev_text.opacity]
+		self.ids.type_spinner.bind(text=self.show_selected_value_spinner)
+		self.ids.state_sppiner.bind(text=self.show_spinner_state)
+		self.ids.location_sppiner.bind(text=self.show_spinner_location)
+		
+
+	def adddevice(self):
+    	#self.manager.current = 'student_screen'
+		if (self.device_id==0):
+			message = 'Please chooes device type'
+			popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+			popup.open()
+			return
+		if(self.state ==10):
+			message = 'Please choose device state'
+			popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+			popup.open()
+			return
+		
+		if(self.location==10):
+			message = 'Please choose device location'
+			popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+			popup.open()
+			return
+
+		if(len(self.ids.label_addDev_text.text) ==0 or len(self.ids.dtype_addDev_text.text) ==0):
+			message = 'Please enter device data'
+			popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+			popup.open()
+			return
+		for test in texts:
+			if(test.opacity==1 and len(test.text) ==0):
+				message = 'Please enter device data'
+				popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+				popup.open()
+				return
+
+		try:
+			id = self.device_id * 10000000 + int(self.ids.label_addDev_text.text)
+			dtype = self.ids.dtype_addDev_text.text
+			if (self.device_id==7):
+				payload = {'id': [id],'dtype':[dtype],'location':[self.location],'state':[self.state],'OVERALL_REVIEW':[0],'NUM_REVIEWS':[1],'tech_id':[ID],'CPU':[self.texts[2].text],'GPU':[self.texts[1].text],'RAM':[self.texts[0].text]}
+			elif (self.device_id==5):
+				payload = {'id': [id],'dtype':[dtype],'location':[self.location],'state':[self.state],'OVERALL_REVIEW':[0],'NUM_REVIEWS':[1],'tech_id':[ID],'code':[int(self.texts[3].text)]}
+			else:
+				payload = {'id': [id],'dtype':[dtype],'location':[self.location],'state':[self.state],'OVERALL_REVIEW':[0],'NUM_REVIEWS':[1],'tech_id':[ID]}
+			isLoggedin = requests.post('http://warehub-api.azurewebsites.net/add_device', data = payload)
+			t.add_device(int(result['id'][0]), result['dtype'][0], int(result['location'][0]), result['state'][0], result['OVERALL_REVIEW'][0],result['NUM_REVIEWS'][0],result['tech_id'][0],result['CPU'][0],result['GPU'][0],result['RAM'][0])
+
+		except ValueError:
+			message = 'invalid data'
+			popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+			popup.open()
+
+		except requests.exceptions.ConnectionError:
+			message = 'Check your internet connetcion'
+			popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+			popup.open()
+
+
+
+
+
+
+class AdditionScreen(Screen):
+	def on_pre_enter(self):
+		if additionScreenMode == 2:
+			self.ids.name_text.hint_text = 'Code'
+		else:
+			self.ids.name_text.hint_text = 'Name'
+
+
+
+	def add(self):
+		thisName = self.ids.name_text.text
+		link = self.ids.link_text.text
+		if len(thisName)>0 and len(link)>0:
+			if additionScreenMode == 0:
+				try:
+					payload = {'name':thisName, 'link': link}
+					requests.post('http://warehub-api.azurewebsites.net/add_os', data = payload)
+				except requests.exceptions.ConnectionError:
+					message = 'Check your internet connetcion'
+					popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+					popup.open()
+			elif additionScreenMode == 1:
+				try:
+					payload = {'name':thisName, 'link': link}
+					requests.post('http://warehub-api.azurewebsites.net/add_software', data = payload)
+				except requests.exceptions.ConnectionError:
+					message = 'Check your internet connetcion'
+					popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+					popup.open()
+			elif additionScreenMode == 2:
+				try:
+					payload = {'code':thisName, 'gate': link}
+					requests.post('http://warehub-api.azurewebsites.net/add_ictype', data = payload)
+				except requests.exceptions.ConnectionError:
+					message = 'Check your internet connetcion'
+					popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+					popup.open()
+		else:
+			message = 'please enter your id and password'
+			popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+			popup.open()
+
+
+
+
 
 
 class ScreenManagment(ScreenManager):
 	login_screen = ObjectProperty(None)
 	manager_screen = ObjectProperty(None)
+	clear_screen = ObjectProperty(None)
 
 
 
