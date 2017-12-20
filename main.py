@@ -259,7 +259,10 @@ class StudentScreen(Screen):
 			self.my_list.adapter.bind(on_selection_change=self.my_list_functionalities)
 			self.mode = 0
 			for s in data:
-				self.my_list.adapter.data.extend([strpre.format(s[0],s[1],s[2],s[3],s[4]/s[5])])
+				try:
+					self.my_list.adapter.data.extend([strpre.format(s[0],s[1],s[2],s[3],s[4]/s[5])])
+				except:
+					self.my_list.adapter.data.extend([strpre.format(s[0],s[1],s[2],s[3],'Not Rated')])
 				self.my_list._trigger_reset_populate()
 		except requests.exceptions.ConnectionError:
 			message = 'Check your internet connetcion'
@@ -480,7 +483,10 @@ class TechScreen(Screen):
 			strpre="ID: {}\nType: {}    location:{}\nstate: {}     rate: {}"
 			#self.tech_list_view.adapter.bind(on_selection_change=self.my_list_functionalities)
 			for s in data:
-				self.tech_list_view.adapter.data.extend([strpre.format(s[0],s[1],s[2],s[3],s[4]/s[5])])
+				try:
+					self.tech_list_view.adapter.data.extend([strpre.format(s[0],s[1],s[2],s[3],s[4]/s[5])])
+				except:
+					self.tech_list_view.adapter.data.extend([strpre.format(s[0],s[1],s[2],s[3],'Not Rated')])
 				self.tech_list_view._trigger_reset_populate()
 		except requests.exceptions.ConnectionError:
 			message = 'Check your internet connetcion'
@@ -525,7 +531,64 @@ class TechScreen(Screen):
 		self.manager.current = 'clear_screen'
 		self.manager.current = 'addition_screen'
 
+class PCOthersScreen(Screen):
+    def on_pre_enter ():
+		try:
+			self.pcs = requests.get('http://warehub-api.azurewebsites.net/retrive_devices/5')
+			self.pcs = json.loads(self.pcs.text)
+			self.soft = requests.get('http://warehub-api.azurewebsites.net/getsoftware')
+			self.soft = json.loads(self.soft.text)
+			self.OSs = requests.get('http://warehub-api.azurewebsites.net/getOS')
+			self.OSs = json.loads(self.OSs.text)
 
+		except requests.exceptions.ConnectionError:
+			message = 'Check your internet connetcion'
+			popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+			popup.open()
+			self.manager.current = 'tech_screen'
+
+    	self.ids.PC_Labelspinner.values=[int(x[0])%1000000 for x in pcs]
+		self.ids.Software_sppiner.values=[x[1] for x in soft ]
+		self.ids.OS_sppiner.values=[x[1] for x in OSs ]
+
+	def addtoPC():
+    	if self.ids.PC_Labelspinner.text=='PC Label':
+			message = 'Choose the Device first'
+			popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+			popup.open()
+			return
+		
+		if self.ids.Software_sppiner.text != 'Software':
+    		dtype = x[0] for x in self.soft if x[1]==self.ids.Software_sppiner.text
+			payload = {'pc_id': [int()+50000000],'software_id':[dtype]}
+			try:
+				isLoggedin = requests.post('http://warehub-api.azurewebsites.net/add_pc_software', data = payload)
+			except requests.exceptions.ConnectionError:
+				message = 'Check your internet connetcion'
+				popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+				popup.open()
+				return
+		
+		if self.ids.OS_sppiner.text != 'OS':
+    		dtype = x[0] for x in self.OSs if x[1]==self.ids.OS_sppiner.text
+			payload = {'pc_id': [int()+50000000],'os_id':[dtype]}
+			try:
+				isLoggedin = requests.post('http://warehub-api.azurewebsites.net/add_pc_os', data = payload)
+			except requests.exceptions.ConnectionError:
+				message = 'Check your internet connetcion'
+				popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+				popup.open()
+				return
+		message = 'Done !'
+		popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+		popup.open()
+
+
+		
+
+
+		
+    			
 
 class ClearScreen(Screen):
 	pass
@@ -593,17 +656,17 @@ class AddDeviceScreen(Screen):
 				popup.open()
 				return
 
+
 		try:
 			self.device_id=int(self.device_id)
 			id = self.device_id * 10000000 + int(self.ids.label_addDev_text.text)
 			dtype = self.ids.dtype_addDev_text.text
-			if (self.device_id==7):
-				payload = {'id': [id],'dtype':[dtype],'location':[self.location],'state':[self.state],'OVERALL_REVIEW':[0],'NUM_REVIEWS':[1],'tech_id':[ID],'CPU':[self.texts[2].text],'GPU':[self.texts[1].text],'RAM':[self.texts[0].text]}
-			elif (self.device_id==5):
-				payload = {'id': [id],'dtype':[dtype],'location':[self.location],'state':[self.state],'OVERALL_REVIEW':[0],'NUM_REVIEWS':[1],'tech_id':[ID],'code':[int(self.texts[3].text)]}
+			if (self.device_id==5):
+				payload = {'id': [str(id)],'dtype':[dtype],'location':[self.location],'state':[self.state],'OVERALL_REVIEW':['0'],'NUM_REVIEWS':['0'],'tech_id':[str(ID)],'CPU':[self.ids.CPU_addDev_text.text],'GPU':[self.ids.GPU_addDev_text.text],'RAM':[self.ids.RAM_addDev_text.text]}
+			elif (self.device_id==7):
+				payload = {'id': [str(id)],'dtype':[dtype],'location':[self.location],'state':[self.state],'OVERALL_REVIEW':['0'],'NUM_REVIEWS':['0'],'tech_id':[str(ID)],'code':[self.texts[3].text]}
 			else:
-				payload = {'id': [id],'dtype':[dtype],'location':[self.location],'state':[self.state],'OVERALL_REVIEW':[0],'NUM_REVIEWS':[1],'tech_id':[ID]}
-			print ("iamhere",payload)
+				payload = {'id': [str(id)],'dtype':[dtype],'location':[self.location],'state':[self.state],'OVERALL_REVIEW':['0'],'NUM_REVIEWS':['0'],'tech_id':[str(ID)]}
 			isLoggedin = requests.post('http://warehub-api.azurewebsites.net/add_device', data = payload)
 			message = 'Done !'
 			popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))

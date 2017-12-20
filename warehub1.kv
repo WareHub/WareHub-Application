@@ -401,7 +401,7 @@
 	BoxLayout:
 		id: studentbox
 		orientation: 'horizontal'
-		padding: 0, 50, 20, 50
+		padding: 0, 50, 5, 50
 		BoxLayout:
 		
 			orientation: 'vertical'
@@ -633,6 +633,46 @@
 			size_hint: 1, 0.2
 			text: 'Add'
 			on_release: root.adddevice()
+
+		Button:
+			text: 'Back'
+			size_hint: 0.4, 0.2
+			on_release: root.manager.current = 'clear_screen'; root.manager.current = 'tech_screen'
+
+
+
+
+
+
+<PCOthersScreen>
+	BoxLayout:
+		orientation: 'vertical'
+		padding: 20
+		spacing: 70
+
+
+		BoxLayout:
+			spacing: 20
+			padding: 20
+			size_hint: 1, 0.2
+			orientation: 'horizontal'
+			Spinner:
+				id: PC_Labelspinner
+				text: 'PC Label'
+			Spinner:
+				id: Software_sppiner
+				text: 'Software'
+			Spinner:
+				id: OS_sppiner
+				text: 'OS'
+			
+		Widget:
+			size_hint_y: 0.5
+		Button:
+			size_hint: 1, 0.2
+			text: 'Add to PC'
+			on_release: root.addtoPC()
+
 		Button:
 			text: 'Back'
 			size_hint: 0.4, 0.2
@@ -652,6 +692,7 @@
 	manager_screen: manager_screen
 	device_student_screen: device_student_screen
 	one_device_Tech:one_device_Tech
+	PCOthers_screen:PCOthers_screen
 
 	LoginScreen:
 		id: login_screen
@@ -708,4 +749,8 @@
 	AddDeviceScreen:
 		id: adddevice_screen
 		name: 'adddevice_screen'
+		manager: screen_manager
+	PCOthersScreen:	
+		id: PCOthers_screen
+		name: 'PCOthers_screen'
 		manager: screen_manager
