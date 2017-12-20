@@ -334,14 +334,21 @@ class AddUserScreen(Screen):
 				message = 'Enter valid information'
 				popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
 				popup.open()
+				return 
 			except requests.exceptions.ConnectionError:
 				message = 'Check your internet connetcion'
 				popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
 				popup.open()
+				return
 		else:
 			message = 'Please enter all information of user'
 			popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
 			popup.open()
+			return
+		message = 'Done !'
+		popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+		popup.open()
+
 
 
 class UpdateInfoScreen(Screen):
@@ -532,7 +539,7 @@ class TechScreen(Screen):
 		self.manager.current = 'addition_screen'
 
 class PCOthersScreen(Screen):
-    def on_pre_enter ():
+	def on_pre_enter (self):
 		try:
 			self.pcs = requests.get('http://warehub-api.azurewebsites.net/retrive_devices/5')
 			self.pcs = json.loads(self.pcs.text)
@@ -546,21 +553,21 @@ class PCOthersScreen(Screen):
 			popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
 			popup.open()
 			self.manager.current = 'tech_screen'
+		self.ids.PC_Labelspinner.values=[str(int(x[0])%1000000) for x in self.pcs]
+		self.ids.Software_sppiner.values=[x[1] for x in self.soft ]
+		self.ids.OS_sppiner.values=[x[1] for x in self.OSs ]
 
-    	self.ids.PC_Labelspinner.values=[int(x[0])%1000000 for x in pcs]
-		self.ids.Software_sppiner.values=[x[1] for x in soft ]
-		self.ids.OS_sppiner.values=[x[1] for x in OSs ]
-
-	def addtoPC():
-    	if self.ids.PC_Labelspinner.text=='PC Label':
+	def addtoPC(self):
+		if self.ids.PC_Labelspinner.text=='PC Label':
 			message = 'Choose the Device first'
 			popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
 			popup.open()
 			return
-		
+
 		if self.ids.Software_sppiner.text != 'Software':
-    		dtype = x[0] for x in self.soft if x[1]==self.ids.Software_sppiner.text
-			payload = {'pc_id': [int()+50000000],'software_id':[dtype]}
+			dtype = [x[0] for x in self.soft if x[1]==self.ids.Software_sppiner.text]
+			payload = {'pc_id': [int(self.ids.PC_Labelspinner.text)+50000000],'software_id':[dtype[0]]}
+			print payload
 			try:
 				isLoggedin = requests.post('http://warehub-api.azurewebsites.net/add_pc_software', data = payload)
 			except requests.exceptions.ConnectionError:
@@ -568,10 +575,11 @@ class PCOthersScreen(Screen):
 				popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
 				popup.open()
 				return
-		
+
 		if self.ids.OS_sppiner.text != 'OS':
-    		dtype = x[0] for x in self.OSs if x[1]==self.ids.OS_sppiner.text
-			payload = {'pc_id': [int()+50000000],'os_id':[dtype]}
+			dtype = [x[0] for x in self.OSs if x[1]==self.ids.OS_sppiner.text]
+			payload = {'pc_id': [int(self.ids.PC_Labelspinner.text)+50000000],'os_id':[dtype[0]]}
+			print payload
 			try:
 				isLoggedin = requests.post('http://warehub-api.azurewebsites.net/add_pc_os', data = payload)
 			except requests.exceptions.ConnectionError:
@@ -584,11 +592,6 @@ class PCOthersScreen(Screen):
 		popup.open()
 
 
-		
-
-
-		
-    			
 
 class ClearScreen(Screen):
 	pass
