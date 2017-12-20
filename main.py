@@ -259,7 +259,10 @@ class StudentScreen(Screen):
 			self.my_list.adapter.bind(on_selection_change=self.my_list_functionalities)
 			self.mode = 0
 			for s in data:
-				self.my_list.adapter.data.extend([strpre.format(s[0],s[1],s[2],s[3],s[4]/s[5])])
+				try:
+					self.my_list.adapter.data.extend([strpre.format(s[0],s[1],s[2],s[3],s[4]/s[5])])
+				except:
+					self.my_list.adapter.data.extend([strpre.format(s[0],s[1],s[2],s[3],'Not Rated')])
 				self.my_list._trigger_reset_populate()
 		except requests.exceptions.ConnectionError:
 			message = 'Check your internet connetcion'
@@ -480,7 +483,10 @@ class TechScreen(Screen):
 			strpre="ID: {}\nType: {}    location:{}\nstate: {}     rate: {}"
 			#self.tech_list_view.adapter.bind(on_selection_change=self.my_list_functionalities)
 			for s in data:
-				self.tech_list_view.adapter.data.extend([strpre.format(s[0],s[1],s[2],s[3],s[4]/s[5])])
+				try:
+					self.tech_list_view.adapter.data.extend([strpre.format(s[0],s[1],s[2],s[3],s[4]/s[5])])
+				except:
+					self.tech_list_view.adapter.data.extend([strpre.format(s[0],s[1],s[2],s[3],'Not Rated')])
 				self.tech_list_view._trigger_reset_populate()
 		except requests.exceptions.ConnectionError:
 			message = 'Check your internet connetcion'
@@ -593,16 +599,17 @@ class AddDeviceScreen(Screen):
 				popup.open()
 				return
 
+
 		try:
 			self.device_id=int(self.device_id)
 			id = self.device_id * 10000000 + int(self.ids.label_addDev_text.text)
 			dtype = self.ids.dtype_addDev_text.text
-			if (self.device_id==7):
-				payload = {'id': [id],'dtype':[dtype],'location':[self.location],'state':[self.state],'OVERALL_REVIEW':[0],'NUM_REVIEWS':[1],'tech_id':[ID],'CPU':[self.texts[2].text],'GPU':[self.texts[1].text],'RAM':[self.texts[0].text]}
-			elif (self.device_id==5):
-				payload = {'id': [id],'dtype':[dtype],'location':[self.location],'state':[self.state],'OVERALL_REVIEW':[0],'NUM_REVIEWS':[1],'tech_id':[ID],'code':[int(self.texts[3].text)]}
+			if (self.device_id==5):
+				payload = {'id': [str(id)],'dtype':[dtype],'location':[self.location],'state':[self.state],'OVERALL_REVIEW':['0'],'NUM_REVIEWS':['0'],'tech_id':[str(ID)],'CPU':[self.ids.CPU_addDev_text.text],'GPU':[self.ids.GPU_addDev_text.text],'RAM':[self.ids.RAM_addDev_text.text]}
+			elif (self.device_id==7):
+				payload = {'id': [str(id)],'dtype':[dtype],'location':[self.location],'state':[self.state],'OVERALL_REVIEW':['0'],'NUM_REVIEWS':['0'],'tech_id':[str(ID)],'code':[self.texts[3].text]}
 			else:
-				payload = {'id': [id],'dtype':[dtype],'location':[self.location],'state':[self.state],'OVERALL_REVIEW':[0],'NUM_REVIEWS':[1],'tech_id':[ID]}
+				payload = {'id': [str(id)],'dtype':[dtype],'location':[self.location],'state':[self.state],'OVERALL_REVIEW':['0'],'NUM_REVIEWS':['0'],'tech_id':[str(ID)]}
 			print ("iamhere",payload)
 			isLoggedin = requests.post('http://warehub-api.azurewebsites.net/add_device', data = payload)
 			message = 'Done !'
