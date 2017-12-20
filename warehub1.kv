@@ -173,6 +173,11 @@
 		    	text: 'Update Information'
 		    	on_release:root.manager.current = 'clear_screen'; root.manager.current = 'updateinfo_screen'
 
+		    Spinner:
+		    	text: 'Statistics'
+				id: stats_spinner
+				values: ['rush hours', 'crowded days', 'PCs Demands', 'ICs Demands', 'OS demands', 'Software demands']
+
 		    Button:
 		    	text: 'Sign out'
 		    	on_release:root.manager.current = 'clear_screen'; root.manager.current = 'login_screen'; root.my_list.adapter.data = []
@@ -641,10 +646,19 @@
 
 
 
+<GraphScreen>
+	BoxLayout:
+		Button:
+			text: 'Back'
+			size_hint: 0.4, 0.2
+			on_release: root.manager.current = 'clear_screen'; root.manager.current = 'manager_screen'
+
 
 <ClearScreen>
 	BoxLayout:
 		Widget:
+
+
 
 
 <ScreenManagment>:
@@ -709,4 +723,10 @@
 	AddDeviceScreen:
 		id: adddevice_screen
 		name: 'adddevice_screen'
+		manager: screen_manager
+
+
+	GraphScreen:
+		id: graph_screen
+		name: 'graph_screen'
 		manager: screen_manager

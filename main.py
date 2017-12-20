@@ -24,6 +24,11 @@ from kivy.uix.button import Button
 from kivy.base import runTouchApp
 from kivy.core.window import Window
 
+from backend_kivyagg import FigureCanvasKivyAgg
+from kivy.app import App
+from kivy.uix.boxlayout import BoxLayout
+import matplotlib.pyplot as plt
+
 import json
 import datetime
 
@@ -277,7 +282,7 @@ class StudentScreen(Screen):
 			self.mode = 1
 			self.my_list.adapter.data = []
 			for item in data:
-				self.my_list.adapter.data.extend(['ID: {}\nST: {}\nET: {}\nReserved: {}\nIn Use: {}'.format(item[1], item[2], item[3], item[4], item[5])])
+				self.my_list.adapter.data.extend(['ID: {}\nST: {}\nET: {}\nReserved: {}\nIn Use: {}'.format(item[1], item[2][0:19], item[3][0:19], item[4], item[5])])
 				self.my_list._trigger_reset_populate()
 			popup = Popup(title='', content=Label(text='Click on any demand to be deleted'), size_hint=(None, None), size = (500, 200))
 			popup.open()
@@ -675,6 +680,8 @@ class AdditionScreen(Screen):
 
 
 
+class GraphScreen(Screen):
+	pass
 
 
 
