@@ -536,28 +536,27 @@ class ClearScreen(Screen):
 
 
 class AddDeviceScreen(Screen):
-	def show_selected_value_spinner(self,text):
-		for text in self.texts:
-			text.opacity=0
-
+	def show_selected_value_spinner(self,spinner,text):
+		for onetext in self.texts:
+			onetext.opacity=0
 		global devices_names
-		device_id = devices_names[text]
-		if (device_id==5):
-			texts[0].opacity=1
-			texts[1].opacity=1
-			texts[2].opacity=1
-		elif (device_id==7):
-			texts[3].opacity=1
+		self.device_id = devices_names[text]
+		if (self.device_id=='5'):
+			self.texts[0].opacity=1
+			self.texts[1].opacity=1
+			self.texts[2].opacity=1
+		elif (self.device_id=='7'):
+			self.texts[3].opacity=1
 	
-	def show_spinner_state(self,text):
+	def show_spinner_state(self,spinner,text):
 		self.state=text
-	def show_spinner_location(self,text):
+	def show_spinner_location(self,spinner,text):
 		self.location=text        		
 	def on_pre_enter (self):
 		self.device_id =0
 		self.state=10
 		self.location=10
-		self.texts=[self.ids.RAM_addDev_text,self.ids.GPU_addDev_text.opacity,self.ids.CPU_addDev_text.opacity,self.ids.Code_addDev_text.opacity]
+		self.texts=[self.ids.RAM_addDev_text,self.ids.GPU_addDev_text,self.ids.CPU_addDev_text,self.ids.Code_addDev_text]
 		self.ids.type_spinner.bind(text=self.show_selected_value_spinner)
 		self.ids.state_sppiner.bind(text=self.show_spinner_state)
 		self.ids.location_sppiner.bind(text=self.show_spinner_location)
@@ -587,7 +586,7 @@ class AddDeviceScreen(Screen):
 			popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
 			popup.open()
 			return
-		for test in texts:
+		for test in self.texts:
 			if(test.opacity==1 and len(test.text) ==0):
 				message = 'Please enter device data'
 				popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
@@ -595,6 +594,7 @@ class AddDeviceScreen(Screen):
 				return
 
 		try:
+			self.device_id=int(self.device_id)
 			id = self.device_id * 10000000 + int(self.ids.label_addDev_text.text)
 			dtype = self.ids.dtype_addDev_text.text
 			if (self.device_id==7):
@@ -603,8 +603,13 @@ class AddDeviceScreen(Screen):
 				payload = {'id': [id],'dtype':[dtype],'location':[self.location],'state':[self.state],'OVERALL_REVIEW':[0],'NUM_REVIEWS':[1],'tech_id':[ID],'code':[int(self.texts[3].text)]}
 			else:
 				payload = {'id': [id],'dtype':[dtype],'location':[self.location],'state':[self.state],'OVERALL_REVIEW':[0],'NUM_REVIEWS':[1],'tech_id':[ID]}
+			print ("iamhere",payload)
 			isLoggedin = requests.post('http://warehub-api.azurewebsites.net/add_device', data = payload)
-			t.add_device(int(result['id'][0]), result['dtype'][0], int(result['location'][0]), result['state'][0], result['OVERALL_REVIEW'][0],result['NUM_REVIEWS'][0],result['tech_id'][0],result['CPU'][0],result['GPU'][0],result['RAM'][0])
+			message = 'Done !'
+			popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+			popup.open()
+
+			#t.add_device(int(result['id'][0]), result['dtype'][0], int(result['location'][0]), result['state'][0], result['OVERALL_REVIEW'][0],result['NUM_REVIEWS'][0],result['tech_id'][0],result['CPU'][0],result['GPU'][0],result['RAM'][0])
 
 		except ValueError:
 			message = 'invalid data'
