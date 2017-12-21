@@ -176,7 +176,7 @@
 		    Spinner:
 		    	text: 'Statistics'
 				id: stats_spinner
-				values: ['rush hours', 'crowded days', 'PCs Demands', 'ICs Demands', 'OS demands', 'Software demands', 'Complains']
+				values: ['rush hours', 'crowded days', 'PCs Demands', 'ICs Demands', 'OS demands', 'Software demands', 'Complains', 'PCs Uses', 'ICs Uses']
 
 		    Button:
 		    	text: 'Sign out'
@@ -345,7 +345,7 @@
 	BoxLayout:
 		id: techbox
 		orientation: 'horizontal'
-		padding: 0, 30, 20, 30
+		padding: 0, 30, 5, 30
 		BoxLayout:
 		
 			orientation: 'vertical'
@@ -389,13 +389,13 @@
 		    	on_release: root.manager.current = 'clear_screen'; root.manager.current = 'login_screen'; root.tech_list_view.adapter.data = []
 
 		BoxLayout:
-			padding: 20, 70, 20, 20
+			padding: 20, 0, 5, 10
 			orientation: 'vertical'
 			spacing: 20
 			ListView:
 		        id: tech_list_view
 		        adapter:
-		            ListAdapter(data=[],args_converter=lambda row_index, an_obj: {'text': an_obj,'size_hint_y': None,'height': 160}, cls=main.Student, selection_mode='single', allow_empty_selection=True)
+		            ListAdapter(data=[],args_converter=lambda row_index, an_obj: {'text': an_obj,'size_hint_y': None,'height': 200}, cls=main.Student, selection_mode='single', allow_empty_selection=True)
 
 		    Button:
 		    	size_hint_y: None
@@ -690,6 +690,11 @@
 
 
 
+<SaveScreen>
+	BoxLayout:
+		id: my_box
+		padding: 200
+
 
 <ClearScreen>
 	BoxLayout:
@@ -768,3 +773,7 @@
 		name: 'pc_others_screen'
 		manager: screen_manager
 
+	SaveScreen:
+		id: save_screen
+		name: 'save_screen'
+		manager: screen_manager

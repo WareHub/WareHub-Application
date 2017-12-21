@@ -111,6 +111,10 @@ class ManagerScreen(Screen):
 			self.getStats('getmostused_software')
 		elif text  == 'Complains':
 			self.getStats('getcomplains')
+		elif text  == 'PCs Uses':
+			self.getStats('getmostused_pc')
+		elif text  == 'ICs Uses':
+			self.getStats('getmostused_ic')
 
 
 
@@ -133,6 +137,11 @@ class ManagerScreen(Screen):
 				 strpre = "Name: {}\nDemands: {}"
 			elif text == "getcomplains":
 				 strpre = "ID: {}\nnum Complains: {}"
+			elif text == "getmostused_pc":
+				 strpre = "ID: {}\nUses: {}"
+			elif text == "getmostused_ic":
+				 strpre = "CODE: {}\nnUses: {}"
+
 
 			for s in data:
 				self.my_list.adapter.data.extend([strpre.format(s[0],s[1])])
@@ -312,7 +321,7 @@ class StudentScreen(Screen):
 			data = requests.get('http://warehub-api.azurewebsites.net/retrive_devices/{}'.format(num))
 			data = json.loads(data.text)
 			self.my_list.adapter.data = []
-			strpre="ID: {}\nType: {}    location: {}\nstate: {}    rate: {}"
+			strpre="ID: {}\nType: {}\nlocation: {}\nstate: {}\nrate: {}"
 			self.my_list.adapter.bind(on_selection_change=self.my_list_functionalities)
 			self.mode = 0
 			for s in data:
@@ -447,15 +456,8 @@ class UpdateInfoScreen(Screen):
 
 
 	def backButton(self):
-		if myType == 0:
-			self.manager.current = 'clear_screen'
-			self.manager.current = 'manager_screen'
-		elif myType == 1:
-			self.manager.current = 'clear_screen'
-			self.manager.current = 'student_screen'
-		else:
-			self.manager.current = 'clear_screen'
-			self.manager.current = 'tech_screen'
+		self.manager.current = 'clear_screen'
+		self.manager.current = 'save_screen'
 
 class DeviceTechScreen(Screen):
 	def on_pre_enter(self):
@@ -545,7 +547,7 @@ class TechScreen(Screen):
 			data = json.loads(data.text)
 			self.mode = 0
 			self.tech_list_view.adapter.data = []
-			strpre="ID: {}\nType: {}    location:{}\nstate: {}     rate: {}"
+			strpre="ID: {}\nType: {}\nlocation: {}\nstate: {}\nrate: {}"
 			#self.tech_list_view.adapter.bind(on_selection_change=self.my_list_functionalities)
 			for s in data:
 				try:
@@ -566,7 +568,7 @@ class TechScreen(Screen):
 			self.mode = 1
 			self.tech_list_view.adapter.data = []
 			for item in data:
-				self.tech_list_view.adapter.data.extend(['sID: {}\ndID: {}\nST: {}\nET: {}\nReserved: {}   In Use: {}'.format(item[0], item[1], item[2], item[3], item[4], item[5])])
+				self.tech_list_view.adapter.data.extend(['sID: {}\ndID: {}\nST: {}\nET: {}\nReserved: {}\nIn Use: {}'.format(item[0], item[1], item[2][:19], item[3][:19], item[4], item[5])])
 				self.tech_list_view._trigger_reset_populate()
 			popup = Popup(title='', content=Label(text='Click on any demand to Accept it'), size_hint=(None, None), size = (500, 200))
 			popup.open()
@@ -653,7 +655,21 @@ class ClearScreen(Screen):
 	pass
 
 
+class SaveScreen(Screen):
+	def on_pre_enter(self):
+		self.ids.my_box.add_widget(Button(text = 'Save Information', size_hint = (0.3, 0.3), on_release = self.back))
 
+	def back(self, o):
+		self.ids.my_box.clear_widgets()
+		if myType == 0:
+			self.manager.current = 'clear_screen'
+			self.manager.current = 'manager_screen'
+		elif myType == 1:
+			self.manager.current = 'clear_screen'
+			self.manager.current = 'student_screen'
+		else:
+			self.manager.current = 'clear_screen'
+			self.manager.current = 'tech_screen'
 
 
 
