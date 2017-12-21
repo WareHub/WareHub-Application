@@ -391,14 +391,21 @@ class AddUserScreen(Screen):
 				message = 'Enter valid information'
 				popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
 				popup.open()
+				return 
 			except requests.exceptions.ConnectionError:
 				message = 'Check your internet connetcion'
 				popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
 				popup.open()
+				return
 		else:
 			message = 'Please enter all information of user'
 			popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
 			popup.open()
+			return
+		message = 'Done !'
+		popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+		popup.open()
+
 
 
 class UpdateInfoScreen(Screen):
@@ -510,6 +517,7 @@ class TechScreen(Screen):
 				pass'''
 		if self.mode == 1:
 			if ad.selection:
+				print ("imahere")
 				text = self.tech_list_view.adapter.selection[0].text
 				try:
 					text1 = text.split('\n')
@@ -587,6 +595,57 @@ class TechScreen(Screen):
 		additionScreenMode = 2
 		self.manager.current = 'clear_screen'
 		self.manager.current = 'addition_screen'
+
+class PCOthersScreen(Screen):
+	def on_pre_enter (self):
+		try:
+			self.pcs = requests.get('http://warehub-api.azurewebsites.net/retrive_devices/5')
+			self.pcs = json.loads(self.pcs.text)
+			self.soft = requests.get('http://warehub-api.azurewebsites.net/getsoftware')
+			self.soft = json.loads(self.soft.text)
+			self.OSs = requests.get('http://warehub-api.azurewebsites.net/getOS')
+			self.OSs = json.loads(self.OSs.text)
+
+		except requests.exceptions.ConnectionError:
+			message = 'Check your internet connetcion'
+			popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+			popup.open()
+			self.manager.current = 'tech_screen'
+		self.ids.PC_Labelspinner.values=[str(int(x[0])%1000000) for x in self.pcs]
+		self.ids.Software_sppiner.values=[x[1] for x in self.soft ]
+		self.ids.OS_sppiner.values=[x[1] for x in self.OSs ]
+
+	def addtoPC(self):
+		if self.ids.PC_Labelspinner.text=='PC Label':
+			message = 'Choose the Device first'
+			popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+			popup.open()
+			return
+
+		if self.ids.Software_sppiner.text != 'Software':
+			dtype = [x[0] for x in self.soft if x[1]==self.ids.Software_sppiner.text]
+			payload = {'pc_id': [int(self.ids.PC_Labelspinner.text)+50000000],'software_id':[dtype[0]]}
+			try:
+				isLoggedin = requests.post('http://warehub-api.azurewebsites.net/add_pc_software', data = payload)
+			except requests.exceptions.ConnectionError:
+				message = 'Check your internet connetcion'
+				popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+				popup.open()
+				return
+
+		if self.ids.OS_sppiner.text != 'OS':
+			dtype = [x[0] for x in self.OSs if x[1]==self.ids.OS_sppiner.text]
+			payload = {'pc_id': [int(self.ids.PC_Labelspinner.text)+50000000],'os_id':[dtype[0]]}
+			try:
+				isLoggedin = requests.post('http://warehub-api.azurewebsites.net/add_pc_os', data = payload)
+			except requests.exceptions.ConnectionError:
+				message = 'Check your internet connetcion'
+				popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+				popup.open()
+				return
+		message = 'Done !'
+		popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+		popup.open()
 
 
 
@@ -667,7 +726,7 @@ class AddDeviceScreen(Screen):
 				payload = {'id': [str(id)],'dtype':[dtype],'location':[self.location],'state':[self.state],'OVERALL_REVIEW':['0'],'NUM_REVIEWS':['0'],'tech_id':[str(ID)],'code':[self.texts[3].text]}
 			else:
 				payload = {'id': [str(id)],'dtype':[dtype],'location':[self.location],'state':[self.state],'OVERALL_REVIEW':['0'],'NUM_REVIEWS':['0'],'tech_id':[str(ID)]}
-			print ("iamhere",payload)
+
 			isLoggedin = requests.post('http://warehub-api.azurewebsites.net/add_device', data = payload)
 			message = 'Done !'
 			popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
