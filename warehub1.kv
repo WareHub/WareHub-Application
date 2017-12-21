@@ -176,7 +176,7 @@
 		    Spinner:
 		    	text: 'Statistics'
 				id: stats_spinner
-				values: ['rush hours', 'crowded days', 'PCs Demands', 'ICs Demands', 'OS demands', 'Software demands']
+				values: ['rush hours', 'crowded days', 'PCs Demands', 'ICs Demands', 'OS demands', 'Software demands', 'Complains']
 
 		    Button:
 		    	text: 'Sign out'
@@ -646,13 +646,6 @@
 
 
 
-<GraphScreen>
-	BoxLayout:
-		Button:
-			text: 'Back'
-			size_hint: 0.4, 0.2
-			on_release: root.manager.current = 'clear_screen'; root.manager.current = 'manager_screen'
-
 
 <ClearScreen>
 	BoxLayout:
@@ -725,8 +718,3 @@
 		name: 'adddevice_screen'
 		manager: screen_manager
 
-
-	GraphScreen:
-		id: graph_screen
-		name: 'graph_screen'
-		manager: screen_manager

@@ -24,10 +24,7 @@ from kivy.uix.button import Button
 from kivy.base import runTouchApp
 from kivy.core.window import Window
 
-from backend_kivyagg import FigureCanvasKivyAgg
-from kivy.app import App
-from kivy.uix.boxlayout import BoxLayout
-import matplotlib.pyplot as plt
+
 
 import json
 import datetime
@@ -92,11 +89,66 @@ class Student(ListItemButton):
 	pass
 
 
-
+class GraphScreen(Screen):
+	pass
 
 
 class ManagerScreen(Screen):
 	mode = -1
+
+	def show_selected_value_spinner(self, sp, text):
+		if text == 'rush hours':
+			self.getStats('getrushhour')
+		elif text == 'crowded days':
+			self.getStats('getcrowded_day')
+		elif text == 'PCs Demands':
+			self.getStats('getmostdemanded_pcs')
+		elif text == "ICs Demands":
+			self.getStats('getmostdemanded_ic')
+		elif text  == 'OS demands':
+			self.getStats('getmostused_os')
+		elif text  == 'Software demands':
+			self.getStats('getmostused_software')
+		elif text  == 'Complains':
+			self.getStats('getcomplains')
+
+
+
+	def getStats(self, text):
+		try:
+			data = requests.get('http://warehub-api.azurewebsites.net/{}'.format(text))
+			data = json.loads(data.text)
+			self.my_list.adapter.data = []
+			if text == 'getrushhour':
+				strpre="Time: {}\nDemands: {}"
+			elif text == 'getcrowded_day':
+				strpre = "Date: {}\nDemands: {}"
+			elif text == 'getmostdemanded_pcs':
+				strpre = "ID: {}\nDemands: {}"
+			elif text == "getmostdemanded_ic":
+				 strpre = "CODE: {}\nDemands: {}"
+			elif text == "getmostused_os":
+				 strpre = "Name: {}\nDemands: {}"
+			elif text == "getmostused_software":
+				 strpre = "Name: {}\nDemands: {}"
+			elif text == "getcomplains":
+				 strpre = "ID: {}\nnum Complains: {}"
+
+			for s in data:
+				self.my_list.adapter.data.extend([strpre.format(s[0],s[1])])
+				self.my_list._trigger_reset_populate()
+		except requests.exceptions.ConnectionError:
+			message = 'Check your internet connetcion'
+			popup = Popup(title='', content=Label(text=message), size_hint=(None, None), size = (500, 200))
+			popup.open()
+
+
+	def back(self, instance):
+		self.manager.current = 'clear_screen'
+		self.manager.current = 'manager_screen'
+
+	def on_pre_enter(self):
+		self.ids.stats_spinner.bind(text=self.show_selected_value_spinner)
 	
 	def deleteElement(self):
 		if self.mode == 0:
@@ -680,8 +732,7 @@ class AdditionScreen(Screen):
 
 
 
-class GraphScreen(Screen):
-	pass
+
 
 
 
